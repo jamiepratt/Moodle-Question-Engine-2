@@ -313,6 +313,10 @@ class moodlelib_test extends UnitTestCase {
             '#()*#,9789\'".,<42897></?$(*DSFMO#$*)(SDJ)($*)');
     }
 
+    function test_clean_param_trim() {
+        $this->assertEqual(clean_param("   Frog   \r\n  ", PARAM_TRIM), 'Frog');
+    }
+
     function test_clean_param_clean() {
         // PARAM_CLEAN is an ugly hack, do not use in new code (skodak)
         // instead use more specific type, or submit sothing that can be verified properly
