@@ -120,17 +120,6 @@ class qtype_shortanswer extends question_type {
         $this->initialise_question_answers($question, $questiondata);
     }
 
-    /*
-     * Override the parent class method, to remove escaping from asterisks.
-     */
-    public function get_correct_responses(&$question, &$state) {
-        $response = parent::get_correct_responses($question, $state);
-        if (is_array($response)) {
-            $response[''] = addslashes(str_replace('\*', '*', stripslashes($response[''])));
-        }
-        return $response;
-    }
-
     function get_random_guess_score($questiondata) {
         foreach ($questiondata->options->answers as $aid => $answer) {
             if ('*' == trim($answer->answer)) {
