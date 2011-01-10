@@ -41,6 +41,7 @@ require_login();
 // Check the sesskey.
 if (!confirm_sesskey()) {
     echo 'sesskey failure';
+    die;
 }
 
 // Check that the requested session really exists
