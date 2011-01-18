@@ -166,10 +166,10 @@ class qtype_match_question_test extends UnitTestCase {
                 ), $match->classify_response(array('sub0' => $orderforchoice[2],
                         'sub1' => $orderforchoice[3], 'sub2' => 0, 'sub3' => 0)));
         $this->assertEqual(array(
-                    1 => new question_classified_response(1, 'Mammal', 1),
-                    2 => new question_classified_response(2, 'Amphibian', 1),
-                    3 => new question_classified_response(2, 'Amphibian', 1),
-                    4 => new question_classified_response(1, 'Mammal', 1),
+                    1 => new question_classified_response(1, 'Mammal', 0.25),
+                    2 => new question_classified_response(2, 'Amphibian', 0.25),
+                    3 => new question_classified_response(2, 'Amphibian', 0.25),
+                    4 => new question_classified_response(1, 'Mammal', 0.25),
                 ), $match->classify_response(array('sub0' => $orderforchoice[1],
                         'sub1' => $orderforchoice[2], 'sub2' => $orderforchoice[2],
                         'sub3' => $orderforchoice[1])));

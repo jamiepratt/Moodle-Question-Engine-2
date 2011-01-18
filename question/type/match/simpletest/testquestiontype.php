@@ -96,17 +96,17 @@ class qtype_match_test extends UnitTestCase {
 
         $this->assertEqual(array(
             14 => array(
-                14 => new question_possible_response('frog: amphibian', 1),
+                14 => new question_possible_response('frog: amphibian', 1/3),
                 15 => new question_possible_response('frog: mammal', 0),
                 17 => new question_possible_response('frog: insect', 0),
                 null => question_possible_response::no_response()),
             15 => array(
                 14 => new question_possible_response('cat: amphibian', 0),
-                15 => new question_possible_response('cat: mammal', 1),
+                15 => new question_possible_response('cat: mammal', 1/3),
                 17 => new question_possible_response('cat: insect', 0),
                 null => question_possible_response::no_response()),
             16 => array(
-                14 => new question_possible_response('newt: amphibian', 1),
+                14 => new question_possible_response('newt: amphibian', 1/3),
                 15 => new question_possible_response('newt: mammal', 0),
                 17 => new question_possible_response('newt: insect', 0),
                 null => question_possible_response::no_response()),

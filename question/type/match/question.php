@@ -118,7 +118,7 @@ class qtype_match_question extends question_graded_automatically_with_countback 
             $choice = $this->choices[$selectedchoices[$stemid]];
             $parts[$stemid] = new question_classified_response(
                     $selectedchoices[$stemid], $choice,
-                    $selectedchoices[$stemid] == $this->right[$stemid]);
+                    ($selectedchoices[$stemid] == $this->right[$stemid])/count($this->stems));
         }
         return $parts;
     }
