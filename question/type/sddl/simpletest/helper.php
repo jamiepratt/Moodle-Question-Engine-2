@@ -17,7 +17,7 @@
 
 
 /**
- * Test helper class for the drag-and-drop words into sentences question type.
+ * Test helper class for the selection from drop down list question type.
  *
  * @package qtype_sddl
  * @copyright 2010 The Open University
@@ -29,20 +29,20 @@ class qtype_sddl_test_helper {
      */
     public static function make_a_sddl_question() {
         question_bank::load_question_definition_classes('sddl');
-        $dd = new qtype_sddl_question();
+        $sddl = new qtype_sddl_question();
 
-        test_question_maker::initialise_a_question($dd);
+        test_question_maker::initialise_a_question($sddl);
 
-        $dd->name = 'Drag-and-drop words into sentences question';
-        $dd->questiontext = 'The [[1]] brown [[2]] jumped over the [[3]] dog.';
-        $dd->generalfeedback = 'This sentence uses each letter of the alphabet.';
-        $dd->qtype = question_bank::get_qtype('sddl');
+        $sddl->name = 'Selection from drop down list question';
+        $sddl->questiontext = 'The [[1]] brown [[2]] jumped over the [[3]] dog.';
+        $sddl->generalfeedback = 'This sentence uses each letter of the alphabet.';
+        $sddl->qtype = question_bank::get_qtype('sddl');
 
-        $dd->shufflechoices = true;
+        $sddl->shufflechoices = true;
 
-        test_question_maker::set_standard_combined_feedback_fields($dd);
+        test_question_maker::set_standard_combined_feedback_fields($sddl);
 
-        $dd->choices = array(
+        $sddl->choices = array(
             1 => array(
                 1 => new qtype_sddl_choice('quick', 1),
                 2 => new qtype_sddl_choice('slow', 1)),
@@ -54,11 +54,11 @@ class qtype_sddl_test_helper {
                 2 => new qtype_sddl_choice('assiduous', 3)),
         );
 
-        $dd->places = array(1 => 1, 2 => 2, 3 => 3);
-        $dd->rightchoices = array(1 => 1, 2 => 1, 3 => 1);
-        $dd->textfragments = array('The ', ' brown ', ' jumped over the ', ' dog.');
+        $sddl->places = array(1 => 1, 2 => 2, 3 => 3);
+        $sddl->rightchoices = array(1 => 1, 2 => 1, 3 => 1);
+        $sddl->textfragments = array('The ', ' brown ', ' jumped over the ', ' dog.');
 
-        return $dd;
+        return $sddl;
     }
 
     /**
@@ -66,21 +66,21 @@ class qtype_sddl_test_helper {
      */
     public static function make_a_maths_sddl_question() {
         question_bank::load_question_definition_classes('sddl');
-        $dd = new qtype_sddl_question();
+        $sddl = new qtype_sddl_question();
 
-        test_question_maker::initialise_a_question($dd);
+        test_question_maker::initialise_a_question($sddl);
 
-        $dd->name = 'Drag-and-drop words into sentences question';
-        $dd->questiontext = 'Fill in the operators to make this equation work: ' .
+        $sddl->name = 'Selection from drop down list question';
+        $sddl->questiontext = 'Fill in the operators to make this equation work: ' .
                 '7 [[1]] 11 [[2]] 13 [[1]] 17 [[2]] 19 = 3';
-        $dd->generalfeedback = 'This sentence uses each letter of the alphabet.';
-        $dd->qtype = question_bank::get_qtype('sddl');
+        $sddl->generalfeedback = 'This sentence uses each letter of the alphabet.';
+        $sddl->qtype = question_bank::get_qtype('sddl');
 
-        $dd->shufflechoices = true;
+        $sddl->shufflechoices = true;
 
-        test_question_maker::set_standard_combined_feedback_fields($dd);
+        test_question_maker::set_standard_combined_feedback_fields($sddl);
 
-        $dd->choices = array(
+        $sddl->choices = array(
             1 => array(
                 1 => new qtype_sddl_choice('+', 1, true),
                 2 => new qtype_sddl_choice('-', 1, true),
@@ -88,10 +88,10 @@ class qtype_sddl_test_helper {
                 4 => new qtype_sddl_choice('/', 1, true),
             ));
 
-        $dd->places = array(1 => 1, 2 => 1, 3 => 1, 4 => 1);
-        $dd->rightchoices = array(1 => 1, 2 => 2, 3 => 1, 4 => 2);
-        $dd->textfragments = array('7 ', ' 11 ', ' 13 ', ' 17 ', ' 19 = 3');
+        $sddl->places = array(1 => 1, 2 => 1, 3 => 1, 4 => 1);
+        $sddl->rightchoices = array(1 => 1, 2 => 2, 3 => 1, 4 => 2);
+        $sddl->textfragments = array('7 ', ' 11 ', ' 13 ', ' 17 ', ' 19 = 3');
 
-        return $dd;
+        return $sddl;
     }
 }

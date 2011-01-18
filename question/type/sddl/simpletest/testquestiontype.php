@@ -17,7 +17,7 @@
 
 
 /**
- * Unit tests for the drag-and-drop words into sentences question definition class.
+ * Unit tests for the selection from drop down list question question definition class.
  *
  * @package qtype_sddl
  * @copyright 2010 The Open University
@@ -30,7 +30,7 @@ require_once($CFG->dirroot . '/question/type/sddl/simpletest/helper.php');
 
 
 /**
- * Unit tests for the drag-and-drop words into sentences question definition class.
+ * Unit tests for the selection from drop down list question definition class.
  *
  * @copyright 2010 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -59,41 +59,41 @@ class qtype_sddl_test extends UnitTestCase {
     protected function get_test_question_data() {
         global $USER;
 
-        $dd = new stdClass;
-        $dd->id = 0;
-        $dd->category = 0;
-        $dd->parent = 0;
-        $dd->questiontextformat = FORMAT_HTML;
-        $dd->defaultmark = 1;
-        $dd->penalty = 0.3333333;
-        $dd->length = 1;
-        $dd->stamp = make_unique_id_code();
-        $dd->version = make_unique_id_code();
-        $dd->hidden = 0;
-        $dd->timecreated = time();
-        $dd->timemodified = time();
-        $dd->createdby = $USER->id;
-        $dd->modifiedby = $USER->id;
+        $sddl = new stdClass;
+        $sddl->id = 0;
+        $sddl->category = 0;
+        $sddl->parent = 0;
+        $sddl->questiontextformat = FORMAT_HTML;
+        $sddl->defaultmark = 1;
+        $sddl->penalty = 0.3333333;
+        $sddl->length = 1;
+        $sddl->stamp = make_unique_id_code();
+        $sddl->version = make_unique_id_code();
+        $sddl->hidden = 0;
+        $sddl->timecreated = time();
+        $sddl->timemodified = time();
+        $sddl->createdby = $USER->id;
+        $sddl->modifiedby = $USER->id;
 
-        $dd->name = 'Drag-and-drop words into sentences question';
-        $dd->questiontext = 'The [[1]] brown [[2]] jumped over the [[3]] dog.';
-        $dd->generalfeedback = 'This sentence uses each letter of the alphabet.';
-        $dd->qtype = 'sddl';
+        $sddl->name = 'Selection from drop down list question';
+        $sddl->questiontext = 'The [[1]] brown [[2]] jumped over the [[3]] dog.';
+        $sddl->generalfeedback = 'This sentence uses each letter of the alphabet.';
+        $sddl->qtype = 'sddl';
 
-        $dd->options->shuffleanswers = true;
+        $sddl->options->shuffleanswers = true;
 
-        test_question_maker::set_standard_combined_feedback_fields($dd->options);
+        test_question_maker::set_standard_combined_feedback_fields($sddl->options);
 
-        $dd->options->answers = array(
-            (object) array('answer' => 'quick', 'feedback' => 'O:8:"stdClass":2:{s:9:"draggroup";s:1:"1";s:8:"infinite";i:0;}'),
-            (object) array('answer' => 'fox', 'feedback' => 'O:8:"stdClass":2:{s:9:"draggroup";s:1:"2";s:8:"infinite";i:0;}'),
-            (object) array('answer' => 'lazy', 'feedback' => 'O:8:"stdClass":2:{s:9:"draggroup";s:1:"3";s:8:"infinite";i:0;}'),
-            (object) array('answer' => 'assiduous', 'feedback' => 'O:8:"stdClass":2:{s:9:"draggroup";s:1:"3";s:8:"infinite";i:0;}'),
-            (object) array('answer' => 'dog', 'feedback' => 'O:8:"stdClass":2:{s:9:"draggroup";s:1:"2";s:8:"infinite";i:0;}'),
-            (object) array('answer' => 'slow', 'feedback' => 'O:8:"stdClass":2:{s:9:"draggroup";s:1:"1";s:8:"infinite";i:0;}'),
+        $sddl->options->answers = array(
+            (object) array('answer' => 'quick', 'feedback' => '1'),
+            (object) array('answer' => 'fox', 'feedback' => '2'),
+            (object) array('answer' => 'lazy', 'feedback' => '3'),
+            (object) array('answer' => 'assiduous', 'feedback' => '3'),
+            (object) array('answer' => 'dog', 'feedback' => '2'),
+            (object) array('answer' => 'slow', 'feedback' => '1'),
         );
 
-        return $dd;
+        return $sddl;
     }
 
     public function test_name() {
@@ -143,7 +143,7 @@ class qtype_sddl_test extends UnitTestCase {
     public function test_xml_import() {
         $xml = '  <question type="sddl">
     <name>
-      <text>A drag-and-drop question</text>
+      <text>A selection from drop down list question</text>
     </name>
     <questiontext format="moodle_auto_format">
       <text>Put these in order: [[1]], [[2]], [[3]].</text>
@@ -165,19 +165,18 @@ class qtype_sddl_test extends UnitTestCase {
       <text><![CDATA[<p>Your answer is incorrect.</p>]]></text>
     </incorrectfeedback>
     <shownumcorrect/>
-    <dragbox>
+    <selectoption>
       <text>Alpha</text>
       <group>1</group>
-    </dragbox>
-    <dragbox>
+    </selectoption>
+    <selectoption>
       <text>Beta</text>
       <group>1</group>
-    </dragbox>
-    <dragbox>
+    </selectoption>
+    <selectoption>
       <text>Gamma</text>
       <group>1</group>
-      <infinite/>
-    </dragbox>
+    </selectoption>
     <hint>
       <text>Try again.</text>
       <shownumcorrect />
@@ -196,7 +195,7 @@ class qtype_sddl_test extends UnitTestCase {
 
         $expectedq = new stdClass;
         $expectedq->qtype = 'sddl';
-        $expectedq->name = 'A drag-and-drop question';
+        $expectedq->name = 'A selection from drop down list question';
         $expectedq->questiontext = 'Put these in order: [[1]], [[2]], [[3]].';
         $expectedq->questiontextformat = FORMAT_MOODLE;
         $expectedq->generalfeedback = 'The answer is Alpha, Beta, Gamma.';
@@ -211,9 +210,9 @@ class qtype_sddl_test extends UnitTestCase {
         $expectedq->incorrectfeedback = '<p>Your answer is incorrect.</p>';
 
         $expectedq->choices = array(
-            array('answer' => 'Alpha', 'draggroup' => 1, 'infinite' => false),
-            array('answer' => 'Beta', 'draggroup' => 1, 'infinite' => false),
-            array('answer' => 'Gamma', 'draggroup' => 1, 'infinite' => true),
+            array('answer' => 'Alpha', 'selectgroup' => 1),
+            array('answer' => 'Beta', 'selectgroup' => 1),
+            array('answer' => 'Gamma', 'selectgroup' => 1),
         );
 
         $expectedq->hint = array('Try again.', 'These are the first three letters of the Greek alphabet.');
@@ -229,7 +228,7 @@ class qtype_sddl_test extends UnitTestCase {
       <text>QDandD1 Base definition</text>
     </name>
     <questiontext format="html">
-      <text>&lt;p&gt;Drag and drop the words from the list below to fill the blank spaces and correctly complete the sentence.&lt;/p&gt; &lt;p&gt;At 25°C all aqueous basic solutions have [[1]]&#160;ion concentrations less than [[8]]&lt;br /&gt;mol litre&lt;sup&gt;-1&lt;/sup&gt; and pH values [[9]] than [[6]].&lt;/p&gt; &lt;!--DONOTCLEAN--&gt;</text>
+      <text>&lt;p&gt;Select from the words from the list below to correctly complete the sentence.&lt;/p&gt; &lt;p&gt;At 25°C all aqueous basic solutions have [[1]]&#160;ion concentrations less than [[8]]&lt;br /&gt;mol litre&lt;sup&gt;-1&lt;/sup&gt; and pH values [[9]] than [[6]].&lt;/p&gt; &lt;!--DONOTCLEAN--&gt;</text>
     </questiontext>
     <image></image>
     <generalfeedback>
@@ -244,70 +243,70 @@ class qtype_sddl_test extends UnitTestCase {
       <correctanswer>1</correctanswer>
       <text>hydrogen</text>
       <feedback>
-        <text>O:8:"stdClass":2:{s:9:"draggroup";s:1:"1";s:8:"infinite";i:0;}</text>
+        <text>1</text>
       </feedback>
     </answer>
     <answer>
       <correctanswer>0</correctanswer>
       <text>positive</text>
       <feedback>
-        <text>O:8:"stdClass":2:{s:9:"draggroup";s:1:"1";s:8:"infinite";i:0;}</text>
+        <text>1</text>
       </feedback>
     </answer>
     <answer>
       <correctanswer>0</correctanswer>
       <text>hydroxide</text>
       <feedback>
-        <text>O:8:"stdClass":2:{s:9:"draggroup";s:1:"1";s:8:"infinite";i:0;}</text>
+        <text>1</text>
       </feedback>
     </answer>
     <answer>
       <correctanswer>0</correctanswer>
       <text>negative</text>
       <feedback>
-        <text>O:8:"stdClass":2:{s:9:"draggroup";s:1:"1";s:8:"infinite";i:0;}</text>
+        <text>1</text>
       </feedback>
     </answer>
     <answer>
       <correctanswer>0</correctanswer>
       <text>10&lt;sup&gt;7&lt;/sup&gt;</text>
       <feedback>
-        <text>O:8:"stdClass":2:{s:9:"draggroup";s:1:"2";s:8:"infinite";i:0;}</text>
+        <text>2</text>
       </feedback>
     </answer>
     <answer>
       <correctanswer>1</correctanswer>
       <text>7</text>
       <feedback>
-        <text>O:8:"stdClass":2:{s:9:"draggroup";s:1:"2";s:8:"infinite";i:0;}</text>
+        <text>2</text>
       </feedback>
     </answer>
     <answer>
       <correctanswer>0</correctanswer>
       <text>1</text>
       <feedback>
-        <text>O:8:"stdClass":2:{s:9:"draggroup";s:1:"2";s:8:"infinite";i:0;}</text>
+        <text>2</text>
       </feedback>
     </answer>
     <answer>
       <correctanswer>1</correctanswer>
       <text>10&lt;sup&gt;-7&lt;/sup&gt;</text>
       <feedback>
-        <text>O:8:"stdClass":2:{s:9:"draggroup";s:1:"2";s:8:"infinite";i:0;}</text>
+        <text>2</text>
       </feedback>
     </answer>
     <answer>
       <correctanswer>1</correctanswer>
       <text>greater</text>
       <feedback>
-        <text>O:8:"stdClass":2:{s:9:"draggroup";s:1:"3";s:8:"infinite";i:0;}</text>
+        <text>2</text>
       </feedback>
     </answer>
     <answer>
       <correctanswer>0</correctanswer>
       <text>less</text>
       <feedback>
-        <text>O:8:"stdClass":2:{s:9:"draggroup";s:1:"3";s:8:"infinite";i:0;}</text>
+        <text>3</text>
       </feedback>
     </answer>
     <correctfeedback>
@@ -346,7 +345,7 @@ class qtype_sddl_test extends UnitTestCase {
         $expectedq = new stdClass;
         $expectedq->qtype = 'sddl';
         $expectedq->name = 'QDandD1 Base definition';
-        $expectedq->questiontext = '<p>Drag and drop the words from the list below to fill the blank spaces and correctly complete the sentence.</p><p>At 25°C all aqueous basic solutions have [[1]] ion concentrations less than [[8]]<br />mol litre<sup>-1</sup> and pH values [[9]] than [[6]].</p><!--DONOTCLEAN-->';
+        $expectedq->questiontext = '<p>Select from the lists below to correctly complete the sentence.</p><p>At 25°C all aqueous basic solutions have [[1]] ion concentrations less than [[8]]<br />mol litre<sup>-1</sup> and pH values [[9]] than [[6]].</p><!--DONOTCLEAN-->';
         $expectedq->questiontextformat = FORMAT_HTML;
         $expectedq->generalfeedback = '<p>At 25 &#xB0;C all aqueous basic solutions have hydrogen ion concentrations less than 10<sup>&#x2212;7</sup> mol litre<sup>&#x2212;1</sup> and pH values greater than 7.</p><p>See Section 9 of S103 <em class=\"italic\">Discovering Science</em> Block 8.</p>';
         $expectedq->defaultmark = 1;
@@ -360,16 +359,16 @@ class qtype_sddl_test extends UnitTestCase {
         $expectedq->incorrectfeedback = 'Your answer is incorrect.';
 
         $expectedq->choices = array(
-            array('answer' => 'hydrogen', 'draggroup' => 1, 'infinite' => false),
-            array('answer' => 'positive', 'draggroup' => 1, 'infinite' => false),
-            array('answer' => 'hydroxide', 'draggroup' => 1, 'infinite' => false),
-            array('answer' => 'negative', 'draggroup' => 1, 'infinite' => false),
-            array('answer' => '10<sup>7</sup>', 'draggroup' => 2, 'infinite' => false),
-            array('answer' => '7', 'draggroup' => 2, 'infinite' => false),
-            array('answer' => '1', 'draggroup' => 2, 'infinite' => false),
-            array('answer' => '10<sup>-7</sup>', 'draggroup' => 2, 'infinite' => false),
-            array('answer' => 'greater', 'draggroup' => 3, 'infinite' => false),
-            array('answer' => 'less', 'draggroup' => 3, 'infinite' => false),
+            array('answer' => 'hydrogen', 'selectgroup' => 1),
+            array('answer' => 'positive', 'selectgroup' => 1),
+            array('answer' => 'hydroxide', 'selectgroup' => 1),
+            array('answer' => 'negative', 'selectgroup' => 1),
+            array('answer' => '10<sup>7</sup>', 'selectgroup' => 2),
+            array('answer' => '7', 'selectgroup' => 2),
+            array('answer' => '1', 'selectgroup' => 2),
+            array('answer' => '10<sup>-7</sup>', 'selectgroup' => 2),
+            array('answer' => 'greater', 'selectgroup' => 3),
+            array('answer' => 'less', 'selectgroup' => 3),
         );
 
         $expectedq->hint = array(
@@ -386,7 +385,7 @@ class qtype_sddl_test extends UnitTestCase {
         $qdata = new stdClass;
         $qdata->id = 123;
         $qdata->qtype = 'sddl';
-        $qdata->name = 'A drag-and-drop question';
+        $qdata->name = 'A select from drop down list question';
         $qdata->questiontext = 'Put these in order: [[1]], [[2]], [[3]].';
         $qdata->questiontextformat = FORMAT_MOODLE;
         $qdata->generalfeedback = 'The answer is Alpha, Beta, Gamma.';
@@ -402,9 +401,9 @@ class qtype_sddl_test extends UnitTestCase {
         $qdata->options->incorrectfeedback = '<p>Your answer is incorrect.</p>';
 
         $qdata->options->answers = array(
-            new question_answer('Alpha', 0, 'O:8:"stdClass":2:{s:9:"draggroup";s:1:"1";s:8:"infinite";b:0;}'),
-            new question_answer('Beta', 0, 'O:8:"stdClass":2:{s:9:"draggroup";s:1:"1";s:8:"infinite";b:0;}'),
-            new question_answer('Gamma', 0, 'O:8:"stdClass":2:{s:9:"draggroup";s:1:"1";s:8:"infinite";b:1;}'),
+            new question_answer('Alpha', 0, '1'),
+            new question_answer('Beta', 0, '1'),
+            new question_answer('Gamma', 0, '1'),
         );
 
         $qdata->hints = array(
@@ -418,7 +417,7 @@ class qtype_sddl_test extends UnitTestCase {
         $expectedxml = '<!-- question: 123  -->
   <question type="sddl">
     <name>
-      <text>A drag-and-drop question</text>
+      <text>A select from drop down list question</text>
     </name>
     <questiontext format="moodle_auto_format">
       <text>Put these in order: [[1]], [[2]], [[3]].</text>
@@ -440,19 +439,18 @@ class qtype_sddl_test extends UnitTestCase {
       <text><![CDATA[<p>Your answer is incorrect.</p>]]></text>
     </incorrectfeedback>
     <shownumcorrect/>
-    <dragbox>
+    <selectoption>
       <text>Alpha</text>
       <group>1</group>
-    </dragbox>
-    <dragbox>
+    </selectoption>
+    <selectoption>
       <text>Beta</text>
       <group>1</group>
-    </dragbox>
-    <dragbox>
+    </selectoption>
+    <selectoption>
       <text>Gamma</text>
       <group>1</group>
-      <infinite/>
-    </dragbox>
+    </selectoption>
     <hint>
       <text>Try again.</text>
       <shownumcorrect/>

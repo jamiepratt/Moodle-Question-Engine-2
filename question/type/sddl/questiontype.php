@@ -17,7 +17,7 @@
 
 
 /**
- * Question type class for the drag-and-drop words into sentences question type.
+ * Question type class for the select from drop down list question type.
  *
  * @package qtype_sddl
  * @copyright 2009 The Open University
@@ -31,19 +31,14 @@ require_once($CFG->dirroot . '/question/format/xml/format.php');
 
 
 /**
- * The drag-and-drop words into sentences question type class.
+ * The select from drop down list question type class.
  *
  * @copyright 2009 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_sddl extends question_type {
 
-    protected function serialize_draggroup_infinite($draggroup, $infinite){
-        $output = new stdClass;
-        $output->draggroup = $draggroup;
-        $output->infinite = $infinite;
-        return serialize($output);
-    }
+
 
     public function save_question_options($question) {
         $result = new stdClass;
@@ -59,15 +54,14 @@ class qtype_sddl extends question_type {
                 continue;
             }
 
-            $feedback = addslashes($this->serialize_draggroup_infinite(
-                    $choice['draggroup'], !empty($choice['infinite'])));
+            $feedback = $choice['selectgroup'];
 
             if ($answer = array_shift($oldanswers)) {  // Existing answer, so reuse it
                 $answer->answer = $choice['answer'];
                 $answer->fraction = 0;
                 $answer->feedback = $feedback;
                 if (!update_record('question_answers', $answer)) {
-                    $result->error = "Could not update drag and drop question answer! (id=$answer->id)";
+                    $result->error = "Could not update select from drop down list question answer! (id=$answer->id)";
                     return $result;
                 }
             } else {
@@ -77,7 +71,7 @@ class qtype_sddl extends question_type {
                 $answer->fraction = 0;
                 $answer->feedback = $feedback;
                 if (!$answer->id = insert_record('question_answers', $answer)) {
-                    $result->error = 'Could not insert drag and drop question answer!';
+                    $result->error = 'Could not insert select from drop down list question answer!';
                     return $result;
                 }
             }
@@ -106,13 +100,13 @@ class qtype_sddl extends question_type {
 
         if ($update) {
             if (!update_record('question_sddl', $options)) {
-                $result->error = "Could not update question drag and drop wordsintosentences options! (id=$options->id)";
+                $result->error = "Could not update question select from drop down list options! (id=$options->id)";
                 return $result;
             }
 
         } else {
             if (!insert_record('question_sddl', $options)) {
-                $result->error = 'Could not insert question drag and drop wordsintosentences options!';
+                $result->error = 'Could not insert question select from drop down list options!';
                 return $result;
             }
         }
@@ -125,7 +119,7 @@ class qtype_sddl extends question_type {
     public function get_question_options($question) {
         // Get additional information from database and attach it to the question object
         if (!$question->options = get_record('question_sddl', 'questionid', $question->id)) {
-            notify('Error: Missing question options for ou drag and drop wordsintosentences question'.$question->id.'!');
+            notify('Error: Missing question options for ou select from drop down list question'.$question->id.'!');
             return false;
         }
 
@@ -154,19 +148,17 @@ class qtype_sddl extends question_type {
         // Store the choices in arrays by group.
         $i = 1;
         foreach ($questiondata->options->answers as $choicedata) {
-            $options = unserialize($choicedata->feedback);
-            $choice = new qtype_sddl_choice($choicedata->answer,
-                    $options->draggroup, $options->infinite);
+            $choice = new qtype_sddl_choice($choicedata->answer, $choicedata->feedback);
 
-            if (array_key_exists($options->draggroup, $question->choices)) {
-                $question->choices[$options->draggroup][] = $choice;
+            if (array_key_exists($choicedata->feedback, $question->choices)) {
+                $question->choices[$choicedata->feedback][] = $choice;
             } else {
-                $question->choices[$options->draggroup][1] = $choice;
+                $question->choices[$choicedata->feedback][1] = $choice;
             }
 
-            end($question->choices[$options->draggroup]);
-            $choiceindexmap[$i] = array($options->draggroup,
-                    key($question->choices[$options->draggroup]));
+            end($question->choices[$choicedata->feedback]);
+            $choiceindexmap[$i] = array($choicedata->feedback,
+                    key($question->choices[$choicedata->feedback]));
             $i += 1;
         }
 
@@ -213,9 +205,7 @@ class qtype_sddl extends question_type {
             $answers[$count]['id'] = $subquestion->id;
             $answers[$count]['answer'] = $subquestion->answer;
             $answers[$count]['fraction'] = $subquestion->fraction;
-            $feedback = unserialize( $subquestion->feedback);
-            $answers[$count]['draggroup'] = $feedback->draggroup;
-            $answers[$count]['infinite'] = $feedback->infinite;
+            $answers[$count]['selectgroup'] = $subquestion->feedback;
             $answers[$count]['choice'] = $count+1;
             ++$count;
         }
@@ -286,7 +276,7 @@ class qtype_sddl extends question_type {
     protected function get_group_of_players ($question, $state, $subquestions, $group){
         $goupofanswers=array();
         foreach($subquestions as $key=>$subquestion) {
-            if($subquestion['draggroup'] == $group){
+            if($subquestion['selectgroup'] == $group){
                 $goupofanswers[] =  $subquestion;
             }
         }
@@ -330,18 +320,16 @@ class qtype_sddl extends question_type {
         $question->shuffleanswers = $format->trans_single(
                 $format->getpath($data, array('#', 'shuffleanswers', 0, '#'), 1));
 
-        if (!empty($data['#']['dragbox'])) {
+        if (!empty($data['#']['selectoption'])) {
             // Modern XML format.
-            $dragboxes = $data['#']['dragbox'];
+            $selectoptions = $data['#']['selectoption'];
             $question->answer = array();
-            $question->draggroup = array();
-            $question->infinite = array();
+            $question->selectgroup = array();
 
-            foreach ($data['#']['dragbox'] as $dragboxxml) {
+            foreach ($data['#']['selectoption'] as $selectoptionxml) {
                 $question->choices[] = array(
-                    'answer' => $format->getpath($dragboxxml, array('#', 'text', 0, '#'), '', true),
-                    'draggroup' => $format->getpath($dragboxxml, array('#', 'group', 0, '#'), 1),
-                    'infinite' => array_key_exists('infinite', $dragboxxml['#']),
+                    'answer' => $format->getpath($selectoptionxml, array('#', 'text', 0, '#'), '', true),
+                    'selectgroup' => $format->getpath($selectoptionxml, array('#', 'group', 0, '#'), 1),
                 );
             }
 
@@ -349,11 +337,9 @@ class qtype_sddl extends question_type {
             // Legacy format containing PHP serialisation.
             foreach ($data['#']['answer'] as $answerxml) {
                 $ans = $format->import_answer($answerxml);
-                $options = unserialize(stripslashes($ans->feedback));
                 $question->choices[] = array(
                     'answer' => $ans->answer,
-                    'draggroup' => $options->draggroup,
-                    'infinite' => $options->infinite,
+                    'selectgroup' => $ans->feedback,
                 );
             }
         }
@@ -372,15 +358,10 @@ class qtype_sddl extends question_type {
         $output .= $format->write_combined_feedback($question->options);
 
         foreach ($question->options->answers as $answer) {
-            $options = unserialize($answer->feedback);
-
-            $output .= "    <dragbox>\n";
+            $output .= "    <selectoption>\n";
             $output .= $format->writetext($answer->answer, 3);
-            $output .= "      <group>{$options->draggroup}</group>\n";
-            if ($options->infinite) {
-                $output .= "      <infinite/>\n";
-            }
-            $output .= "    </dragbox>\n";
+            $output .= "      <group>{$answer->feedback}</group>\n";
+            $output .= "    </selectoption>\n";
         }
 
         return $output;
@@ -393,20 +374,20 @@ class qtype_sddl extends question_type {
      */
     public function backup($bf, $preferences, $question, $level = 6) {
         $status = true;
-        $sddl = get_records("question_sddl", "questionid", $question, "id");
+        $sddls = get_records("question_sddl", "questionid", $question, "id");
 
         //If there are sddl
-        if ($sddl) {
+        if ($sddls) {
             //Iterate over each sddl
-            foreach ($sddl as $ddws) {
-                $status = fwrite ($bf,start_tag("DDWORDSSENTENCES",$level,true));
+            foreach ($sddls as $sddl) {
+                $status = fwrite ($bf,start_tag("SDDLS",$level,true));
                 //Print oumultiresponse contents
-                fwrite ($bf,full_tag("SHUFFLEANSWERS",$level+1,false,$ddws->shuffleanswers));
-                fwrite ($bf,full_tag("CORRECTFEEDBACK",$level+1,false,$ddws->correctfeedback));
-                fwrite ($bf,full_tag("PARTIALLYCORRECTFEEDBACK",$level+1,false,$ddws->partiallycorrectfeedback));
-                fwrite ($bf,full_tag("INCORRECTFEEDBACK",$level+1,false,$ddws->incorrectfeedback));
-                fwrite ($bf,full_tag("SHOWNUMCORRECT",$level+1,false,$ddws->shownumcorrect));
-                $status = fwrite ($bf,end_tag("DDWORDSSENTENCES",$level,true));
+                fwrite ($bf,full_tag("SHUFFLEANSWERS",$level+1,false,$sddl->shuffleanswers));
+                fwrite ($bf,full_tag("CORRECTFEEDBACK",$level+1,false,$sddl->correctfeedback));
+                fwrite ($bf,full_tag("PARTIALLYCORRECTFEEDBACK",$level+1,false,$sddl->partiallycorrectfeedback));
+                fwrite ($bf,full_tag("INCORRECTFEEDBACK",$level+1,false,$sddl->incorrectfeedback));
+                fwrite ($bf,full_tag("SHOWNUMCORRECT",$level+1,false,$sddl->shownumcorrect));
+                $status = fwrite ($bf,end_tag("SDDLS",$level,true));
             }
 
             //Now print question_answers
@@ -423,11 +404,11 @@ class qtype_sddl extends question_type {
         $status = true;
 
         //Get the sddl array
-        $sddl = $info['#']['DDWORDSSENTENCES'];
+        $sddls = $info['#']['SDDLS'];
 
         //Iterate over oumultiresponses
-        for($i = 0; $i < sizeof($sddl); $i++) {
-            $mul_info = $sddl[$i];
+        for($i = 0; $i < sizeof($sddls); $i++) {
+            $mul_info = $sddls[$i];
 
             //Now, build the question_sddl record structure
             $sddl = new stdClass;

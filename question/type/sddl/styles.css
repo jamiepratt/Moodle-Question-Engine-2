@@ -15,32 +15,6 @@
     padding-bottom: 0.5em;
 }
 
-.que.sddl .slot {
-    display: inline-block;
-    text-align: center;
-    border: 1px solid #000000;
-}
-.que.sddl .player {
-    display: inline-block;
-    text-align: center;
-    cursor: move;
-    border: 1px solid #000000;
-}
-.que.sddl .player.placed { /* Lets the focus rectangle be visible in IE. */
-    background: transparent;
-}
-
-.que.sddl .readonly {
-    cursor: default;
-}
-
-.que.sddl span.incorrect {
-    background-color: #faa;
-}
-.que.sddl span.correct {
-    background-color: #afa;
-}
-
 .que.sddl .group1 {
     background-color: #FFFFFF;
 }

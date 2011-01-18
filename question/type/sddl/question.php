@@ -17,7 +17,7 @@
 
 
 /**
- * Drag-and-drop words into sentences question definition class.
+ * Select from drop down list question definition class.
  *
  * @package qtype_sddl
  * @copyright 2009 The Open University
@@ -26,7 +26,7 @@
 
 
 /**
- * Represents a drag-and-drop words into sentences question.
+ * Represents select from drop down list question.
  *
  * @copyright 2009 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -284,19 +284,17 @@ class qtype_sddl_question extends question_graded_automatically_with_countback {
 
 
 /**
- * Represents one of the choices (draggable boxes).
+ * Represents one of the choices (select box option).
  *
  * @copyright 2009 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_sddl_choice {
     public $text;
-    public $draggroup;
-    public $isinfinite;
+    public $selectgroup;
 
-    public function __construct($text, $draggroup = 1, $isinfinite = false) {
+    public function __construct($text, $selectgroup = 1) {
         $this->text = $text;
-        $this->draggroup = $draggroup;
-        $this->isinfinite = $isinfinite;
+        $this->selectgroup = $selectgroup;
     }
 }

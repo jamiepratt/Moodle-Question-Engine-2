@@ -17,7 +17,7 @@
 
 
 /**
- * Unit tests for the drag-and-drop words into sentences question definition class.
+ * Unit tests for the selection from drop down list question definition class.
  *
  * @package qtype_sddl
  * @copyright 2010 The Open University
@@ -37,210 +37,210 @@ require_once($CFG->dirroot . '/question/type/sddl/simpletest/helper.php');
 class qtype_sddl_question_test extends UnitTestCase {
 
     public function test_get_question_summary() {
-        $dd = qtype_sddl_test_helper::make_a_sddl_question();
+        $sddl = qtype_sddl_test_helper::make_a_sddl_question();
         $this->assertEqual('The [[1]] brown [[2]] jumped over the [[3]] dog.; [[1]] -> {quick / slow}; [[2]] -> {fox / dog}; [[3]] -> {lazy / assiduous}',
-                $dd->get_question_summary());
+                $sddl->get_question_summary());
     }
 
     public function test_get_question_summary_maths() {
-        $dd = qtype_sddl_test_helper::make_a_maths_sddl_question();
+        $sddl = qtype_sddl_test_helper::make_a_maths_sddl_question();
         $this->assertEqual('Fill in the operators to make this equation work: ' .
                 '7 [[1]] 11 [[2]] 13 [[1]] 17 [[2]] 19 = 3; [[1]] -> {+ / - / * / /}',
-                $dd->get_question_summary());
+                $sddl->get_question_summary());
     }
 
     public function test_summarise_response() {
-        $dd = qtype_sddl_test_helper::make_a_sddl_question();
-        $dd->shufflechoices = false;
-        $dd->init_first_step(new question_attempt_step());
+        $sddl = qtype_sddl_test_helper::make_a_sddl_question();
+        $sddl->shufflechoices = false;
+        $sddl->init_first_step(new question_attempt_step());
 
         $this->assertEqual('{quick} {fox} {lazy}',
-                $dd->summarise_response(array('p1' => '1', 'p2' => '1', 'p3' => '1')));
+                $sddl->summarise_response(array('p1' => '1', 'p2' => '1', 'p3' => '1')));
     }
 
     public function test_summarise_response_maths() {
-        $dd = qtype_sddl_test_helper::make_a_maths_sddl_question();
-        $dd->shufflechoices = false;
-        $dd->init_first_step(new question_attempt_step());
+        $sddl = qtype_sddl_test_helper::make_a_maths_sddl_question();
+        $sddl->shufflechoices = false;
+        $sddl->init_first_step(new question_attempt_step());
 
         $this->assertEqual('{+} {-} {+} {-}',
-                $dd->summarise_response(array('p1' => '1', 'p2' => '2', 'p3' => '1', 'p4' => '2')));
+                $sddl->summarise_response(array('p1' => '1', 'p2' => '2', 'p3' => '1', 'p4' => '2')));
     }
 
     public function test_get_random_guess_score() {
-        $dd = qtype_sddl_test_helper::make_a_sddl_question();
-        $this->assertEqual(0.5, $dd->get_random_guess_score());
+        $sddl = qtype_sddl_test_helper::make_a_sddl_question();
+        $this->assertEqual(0.5, $sddl->get_random_guess_score());
     }
 
     public function test_get_random_guess_score_maths() {
-        $dd = qtype_sddl_test_helper::make_a_maths_sddl_question();
-        $this->assertEqual(0.25, $dd->get_random_guess_score());
+        $sddl = qtype_sddl_test_helper::make_a_maths_sddl_question();
+        $this->assertEqual(0.25, $sddl->get_random_guess_score());
     }
 
     public function test_get_right_choice_for() {
-        $dd = qtype_sddl_test_helper::make_a_sddl_question();
-        $dd->shufflechoices = false;
-        $dd->init_first_step(new question_attempt_step());
+        $sddl = qtype_sddl_test_helper::make_a_sddl_question();
+        $sddl->shufflechoices = false;
+        $sddl->init_first_step(new question_attempt_step());
 
-        $this->assertEqual(1, $dd->get_right_choice_for(1));
-        $this->assertEqual(1, $dd->get_right_choice_for(2));
+        $this->assertEqual(1, $sddl->get_right_choice_for(1));
+        $this->assertEqual(1, $sddl->get_right_choice_for(2));
     }
 
     public function test_get_right_choice_for_maths() {
-        $dd = qtype_sddl_test_helper::make_a_maths_sddl_question();
-        $dd->shufflechoices = false;
-        $dd->init_first_step(new question_attempt_step());
+        $sddl = qtype_sddl_test_helper::make_a_maths_sddl_question();
+        $sddl->shufflechoices = false;
+        $sddl->init_first_step(new question_attempt_step());
 
-        $this->assertEqual(1, $dd->get_right_choice_for(1));
-        $this->assertEqual(2, $dd->get_right_choice_for(2));
+        $this->assertEqual(1, $sddl->get_right_choice_for(1));
+        $this->assertEqual(2, $sddl->get_right_choice_for(2));
     }
 
     public function test_clear_wrong_from_response() {
-        $dd = qtype_sddl_test_helper::make_a_maths_sddl_question();
-        $dd->shufflechoices = false;
-        $dd->init_first_step(new question_attempt_step());
+        $sddl = qtype_sddl_test_helper::make_a_maths_sddl_question();
+        $sddl->shufflechoices = false;
+        $sddl->init_first_step(new question_attempt_step());
 
         $initialresponse = array('p1' => '1', 'p2' => '1', 'p3' => '1', 'p4' => '1');
         $this->assertEqual(array('p1' => '1', 'p2' => '0', 'p3' => '1', 'p4' => '0'),
-                $dd->clear_wrong_from_response($initialresponse));
+                $sddl->clear_wrong_from_response($initialresponse));
     }
 
     public function test_get_num_parts_right() {
-        $dd = qtype_sddl_test_helper::make_a_sddl_question();
-        $dd->shufflechoices = false;
-        $dd->init_first_step(new question_attempt_step());
+        $sddl = qtype_sddl_test_helper::make_a_sddl_question();
+        $sddl->shufflechoices = false;
+        $sddl->init_first_step(new question_attempt_step());
 
         $this->assertEqual(array(2, 3),
-                $dd->get_num_parts_right(array('p1' => '1', 'p2' => '1', 'p3' => '2')));
+                $sddl->get_num_parts_right(array('p1' => '1', 'p2' => '1', 'p3' => '2')));
         $this->assertEqual(array(3, 3),
-                $dd->get_num_parts_right(array('p1' => '1', 'p2' => '1', 'p3' => '1')));
+                $sddl->get_num_parts_right(array('p1' => '1', 'p2' => '1', 'p3' => '1')));
     }
 
     public function test_get_num_parts_right_maths() {
-        $dd = qtype_sddl_test_helper::make_a_maths_sddl_question();
-        $dd->shufflechoices = false;
-        $dd->init_first_step(new question_attempt_step());
+        $sddl = qtype_sddl_test_helper::make_a_maths_sddl_question();
+        $sddl->shufflechoices = false;
+        $sddl->init_first_step(new question_attempt_step());
 
         $this->assertEqual(array(2, 4),
-                $dd->get_num_parts_right(array('p1' => '1', 'p2' => '1', 'p3' => '1', 'p4' => '1')));
+                $sddl->get_num_parts_right(array('p1' => '1', 'p2' => '1', 'p3' => '1', 'p4' => '1')));
     }
 
     public function test_get_expected_data() {
-        $dd = qtype_sddl_test_helper::make_a_sddl_question();
-        $dd->init_first_step(new question_attempt_step());
+        $sddl = qtype_sddl_test_helper::make_a_sddl_question();
+        $sddl->init_first_step(new question_attempt_step());
 
         $this->assertEqual(array('p1' => PARAM_INT, 'p2' => PARAM_INT, 'p3' => PARAM_INT),
-                $dd->get_expected_data());
+                $sddl->get_expected_data());
     }
 
     public function test_get_correct_response() {
-        $dd = qtype_sddl_test_helper::make_a_sddl_question();
-        $dd->shufflechoices = false;
-        $dd->init_first_step(new question_attempt_step());
+        $sddl = qtype_sddl_test_helper::make_a_sddl_question();
+        $sddl->shufflechoices = false;
+        $sddl->init_first_step(new question_attempt_step());
 
         $this->assertEqual(array('p1' => '1', 'p2' => '1', 'p3' => '1'),
-                $dd->get_correct_response());
+                $sddl->get_correct_response());
     }
 
     public function test_get_correct_response_maths() {
-        $dd = qtype_sddl_test_helper::make_a_maths_sddl_question();
-        $dd->shufflechoices = false;
-        $dd->init_first_step(new question_attempt_step());
+        $sddl = qtype_sddl_test_helper::make_a_maths_sddl_question();
+        $sddl->shufflechoices = false;
+        $sddl->init_first_step(new question_attempt_step());
 
         $this->assertEqual(array('p1' => '1', 'p2' => '2', 'p3' => '1', 'p4' => '2'),
-                $dd->get_correct_response());
+                $sddl->get_correct_response());
     }
 
     public function test_is_same_response() {
-        $dd = qtype_sddl_test_helper::make_a_sddl_question();
-        $dd->init_first_step(new question_attempt_step());
+        $sddl = qtype_sddl_test_helper::make_a_sddl_question();
+        $sddl->init_first_step(new question_attempt_step());
 
-        $this->assertTrue($dd->is_same_response(
+        $this->assertTrue($sddl->is_same_response(
                 array(),
                 array('p1' => '0', 'p2' => '0', 'p3' => '0')));
 
-        $this->assertFalse($dd->is_same_response(
+        $this->assertFalse($sddl->is_same_response(
                 array(),
                 array('p1' => '1', 'p2' => '0', 'p3' => '0')));
 
-        $this->assertFalse($dd->is_same_response(
+        $this->assertFalse($sddl->is_same_response(
                 array('p1' => '0', 'p2' => '0', 'p3' => '0'),
                 array('p1' => '1', 'p2' => '0', 'p3' => '0')));
 
-        $this->assertTrue($dd->is_same_response(
+        $this->assertTrue($sddl->is_same_response(
                 array('p1' => '1', 'p2' => '2', 'p3' => '3'),
                 array('p1' => '1', 'p2' => '2', 'p3' => '3')));
 
-        $this->assertFalse($dd->is_same_response(
+        $this->assertFalse($sddl->is_same_response(
                 array('p1' => '1', 'p2' => '2', 'p3' => '3'),
                 array('p1' => '1', 'p2' => '2', 'p3' => '2')));
     }
     public function test_is_complete_response() {
-        $dd = qtype_sddl_test_helper::make_a_sddl_question();
-        $dd->init_first_step(new question_attempt_step());
+        $sddl = qtype_sddl_test_helper::make_a_sddl_question();
+        $sddl->init_first_step(new question_attempt_step());
 
-        $this->assertFalse($dd->is_complete_response(array()));
-        $this->assertFalse($dd->is_complete_response(
+        $this->assertFalse($sddl->is_complete_response(array()));
+        $this->assertFalse($sddl->is_complete_response(
                 array('p1' => '1', 'p2' => '1', 'p3' => '0')));
-        $this->assertFalse($dd->is_complete_response(array('p1' => '1')));
-        $this->assertTrue($dd->is_complete_response(
+        $this->assertFalse($sddl->is_complete_response(array('p1' => '1')));
+        $this->assertTrue($sddl->is_complete_response(
                 array('p1' => '1', 'p2' => '1', 'p3' => '1')));
     }
 
     public function test_is_gradable_response() {
-        $dd = qtype_sddl_test_helper::make_a_sddl_question();
-        $dd->init_first_step(new question_attempt_step());
+        $sddl = qtype_sddl_test_helper::make_a_sddl_question();
+        $sddl->init_first_step(new question_attempt_step());
 
-        $this->assertFalse($dd->is_gradable_response(array()));
-        $this->assertFalse($dd->is_gradable_response(
+        $this->assertFalse($sddl->is_gradable_response(array()));
+        $this->assertFalse($sddl->is_gradable_response(
                 array('p1' => '0', 'p2' => '0', 'p3' => '0')));
-        $this->assertTrue($dd->is_gradable_response(
+        $this->assertTrue($sddl->is_gradable_response(
                 array('p1' => '1', 'p2' => '1', 'p3' => '0')));
-        $this->assertTrue($dd->is_gradable_response(array('p1' => '1')));
-        $this->assertTrue($dd->is_gradable_response(
+        $this->assertTrue($sddl->is_gradable_response(array('p1' => '1')));
+        $this->assertTrue($sddl->is_gradable_response(
                 array('p1' => '1', 'p2' => '1', 'p3' => '1')));
     }
 
     public function test_grading() {
-        $dd = qtype_sddl_test_helper::make_a_sddl_question();
-        $dd->shufflechoices = false;
-        $dd->init_first_step(new question_attempt_step());
+        $sddl = qtype_sddl_test_helper::make_a_sddl_question();
+        $sddl->shufflechoices = false;
+        $sddl->init_first_step(new question_attempt_step());
 
         $this->assertEqual(array(1, question_state::$gradedright),
-                $dd->grade_response(array('p1' => '1', 'p2' => '1', 'p3' => '1')));
+                $sddl->grade_response(array('p1' => '1', 'p2' => '1', 'p3' => '1')));
         $this->assertEqual(array(1/3, question_state::$gradedpartial),
-                $dd->grade_response(array('p1' => '1')));
+                $sddl->grade_response(array('p1' => '1')));
         $this->assertEqual(array(0, question_state::$gradedwrong),
-                $dd->grade_response(array('p1' => '2', 'p2' => '2', 'p3' => '2')));
+                $sddl->grade_response(array('p1' => '2', 'p2' => '2', 'p3' => '2')));
     }
 
     public function test_grading_maths() {
-        $dd = qtype_sddl_test_helper::make_a_maths_sddl_question();
-        $dd->shufflechoices = false;
-        $dd->init_first_step(new question_attempt_step());
+        $sddl = qtype_sddl_test_helper::make_a_maths_sddl_question();
+        $sddl->shufflechoices = false;
+        $sddl->init_first_step(new question_attempt_step());
 
         $this->assertEqual(array(1, question_state::$gradedright),
-                $dd->grade_response(array('p1' => '1', 'p2' => '2', 'p3' => '1', 'p4' => '2')));
+                $sddl->grade_response(array('p1' => '1', 'p2' => '2', 'p3' => '1', 'p4' => '2')));
         $this->assertEqual(array(0.5, question_state::$gradedpartial),
-                $dd->grade_response(array('p1' => '1', 'p2' => '1', 'p3' => '1', 'p4' => '1')));
+                $sddl->grade_response(array('p1' => '1', 'p2' => '1', 'p3' => '1', 'p4' => '1')));
         $this->assertEqual(array(0, question_state::$gradedwrong),
-                $dd->grade_response(array('p1' => '0', 'p2' => '1', 'p3' => '2', 'p4' => '1')));
+                $sddl->grade_response(array('p1' => '0', 'p2' => '1', 'p3' => '2', 'p4' => '1')));
     }
 
     public function test_classify_response() {
-        $dd = qtype_sddl_test_helper::make_a_sddl_question();
-        $dd->shufflechoices = false;
-        $dd->init_first_step(new question_attempt_step());
+        $sddl = qtype_sddl_test_helper::make_a_sddl_question();
+        $sddl->shufflechoices = false;
+        $sddl->init_first_step(new question_attempt_step());
 
         $this->assertEqual(array(
                     1 => new question_classified_response(1, 'quick', 1),
                     2 => new question_classified_response(2, 'dog', 0),
                     3 => new question_classified_response(1, 'lazy', 1),
-                ), $dd->classify_response(array('p1' => '1', 'p2' => '2', 'p3' => '1')));
+                ), $sddl->classify_response(array('p1' => '1', 'p2' => '2', 'p3' => '1')));
         $this->assertEqual(array(
                     1 => question_classified_response::no_response(),
                     2 => new question_classified_response(1, 'fox', 1),
                     3 => new question_classified_response(2, 'assiduous', 0),
-                ), $dd->classify_response(array('p1' => '0', 'p2' => '1', 'p3' => '2')));
+                ), $sddl->classify_response(array('p1' => '0', 'p2' => '1', 'p3' => '2')));
     }
 }

@@ -17,7 +17,7 @@
 
 
 /**
- * Drag-and-drop words into sentences question renderer class.
+ * Select from drop down list question renderer class.
  *
  * @package qtype_sddl
  * @copyright 2010 The Open University
@@ -26,7 +26,7 @@
 
 
 /**
- * Generates the output for drag-and-drop words into sentences questions.
+ * Generates the output for select from drop down list questions.
  *
  * @copyright 2010 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -40,29 +40,17 @@ class qtype_sddl_renderer extends qtype_with_combined_feedback_renderer {
         $questiontext = '';
         foreach ($question->textfragments as $i => $fragment) {
             if ($i > 0) {
-                $questiontext .= $this->drop_box($qa, $i, $options);
+                $questiontext .= $this->select_box($qa, $i, $options);
             }
             $questiontext .= $fragment;
         }
 
-        $dragboxs = '';
-        foreach ($question->choices as $group => $choices) {
-            $dragboxs .= $this->drag_boxes($qa, $group,
-                    $question->get_ordered_choices($group), $options);
-        }
 
         $result = '';
         $result .= html_writer::tag('div', $question->format_text($questiontext),
-                array('class' => 'qtext sddl_questionid_for_javascript', 'id' => $qa->get_qt_field_name('')));
-        $result .= html_writer::tag('div', $dragboxs,
-                array('class' => 'answercontainer'));
+                array('class' => 'qtext', 'id' => $qa->get_qt_field_name('')));
 
-        // We abuse the clear_wrong method to output the hidden form fields we
-        // want irrespective of whether we are actually clearing the wrong
-        // bits of the response.
-        if (!$options->clearwrong) {
-            $result .= $this->clear_wrong($qa, false);
-        }
+
 
         if ($qa->get_state() == question_state::$invalid) {
             $result .= html_writer::nonempty_tag('div',
@@ -73,72 +61,44 @@ class qtype_sddl_renderer extends qtype_with_combined_feedback_renderer {
         return $result;
     }
 
-    /**
-     * Modify the contents of a drag/drop box to fix some IE-related problem.
-     * Unfortunately I don't have more details than that.
-     * @param string $string the box contents.
-     * @return string the box contents modified.
-     */
-    protected function dodgy_ie_fix($string) {
-        return '<sub>&#160;</sub>' . $string . '<sup>&#160;</sup>';
-    }
 
-    protected function drop_box(question_attempt $qa, $place, question_display_options $options) {
+    protected function select_box(question_attempt $qa, $place, question_display_options $options) {
         $question = $qa->get_question();
         $group = $question->places[$place];
-        $boxcontents = $this->dodgy_ie_fix('&#160;');
+
+        $fieldname = $question->field($place);
 
         $value = $qa->get_last_qt_var($question->field($place));
 
         $attributes = array(
             'id' => $this->box_id($qa, 'p' . $place, $group),
-            'class' => 'slot group' . $group
+            'class' => 'group' . $group
         );
 
         if ($options->readonly) {
-            $attributes['class'] .= ' readonly';
-        } else {
-            $attributes['tabindex'] = '0';
+            $attributes['disabled'] = 'disabled';
+        }
+
+        $orderedchoices = $question->get_ordered_choices($group);
+        $selectoptions = array();
+        foreach ($orderedchoices as $orderedchoicevalue => $orderedchoice){
+            $selectoptions[$orderedchoicevalue] = $orderedchoice->text;
         }
 
         $feedbackimage = '';
         if ($options->correctness) {
             $response = $qa->get_last_qt_data();
-            $fieldname = $question->field($place);
             if (array_key_exists($fieldname, $response)) {
                 $fraction = (int) ($response[$fieldname] == $question->get_right_choice_for($place));
-                $attributes['class'] .= ' ' . $this->feedback_class($fraction);
+                $attributes['class'] = $this->feedback_class($fraction);
                 $feedbackimage = $this->feedback_image($fraction);
             }
         }
 
-        return html_writer::tag('span', $boxcontents, $attributes) . ' ' . $feedbackimage;
+        return html_writer::select($selectoptions, $qa->get_qt_field_name($fieldname), $value, ' ', $attributes) . ' ' . $feedbackimage;
     }
 
-    protected function drag_boxes($qa, $group, $choices, question_display_options $options) {
-        $readonly = '';
-        if ($options->readonly) {
-            $readonly = ' readonly';
-        }
 
-        $boxes = '';
-        foreach ($choices as $key => $choice) {
-            //Bug 8632 -  long text entry causes bug in drag and drop field in IE
-            $content = str_replace('-', '&#x2011;', $choice->text);
-            $content = $this->dodgy_ie_fix(str_replace(' ', '&#160;', $content));
-
-            $infinite = '';
-            if ($choice->isinfinite) {
-                $infinite = ' infinite';
-            }
-
-            $boxes .= html_writer::tag('span', $content, array(
-                    'id' => $this->box_id($qa, $key, $choice->draggroup),
-                    'class' => 'player group' . $choice->draggroup . $infinite . $readonly)) . ' ';
-        }
-
-        return html_writer::nonempty_tag('div', $boxes, array('class' => 'answertext'));
-    }
 
     protected function box_id(question_attempt $qa, $place, $group) {
         return $qa->get_qt_field_name($place) . '_' . $group;
@@ -146,58 +106,6 @@ class qtype_sddl_renderer extends qtype_with_combined_feedback_renderer {
 
     public function specific_feedback(question_attempt $qa) {
         return $this->combined_feedback($qa);
-    }
-
-    public function head_code(question_attempt $qa) {
-        require_js(array('yui_dom-event', 'yui_dragdrop'));
-        return parent::head_code($qa);
-    }
-
-    /**
-     * Actually, this question type abuses this method to always ouptut the
-     * hidden fields it needs.
-     */
-    public function clear_wrong(question_attempt $qa, $reallyclear = true) {
-        $question = $qa->get_question();
-        $response = $qa->get_last_qt_data();
-
-        if (!empty($response) && $reallyclear) {
-            $cleanresponse = $question->clear_wrong_from_response($response);
-        } else {
-            $cleanresponse = $response;
-        }
-
-        $output = '';
-        foreach ($question->places as $place => $group) {
-            $fieldname = $question->field($place);
-            if (array_key_exists($fieldname, $response)) {
-                $value = $response[$fieldname];
-            } else {
-                $value = '0';
-            }
-            if (array_key_exists($fieldname, $cleanresponse)) {
-                $cleanvalue = $cleanresponse[$fieldname];
-            } else {
-                $cleanvalue = '0';
-            }
-            if ($cleanvalue != $value) {
-                $output .= html_writer::empty_tag('input', array(
-                        'type' => 'hidden',
-                        'id' => $this->box_id($qa, 'p' . $place, $group) . '_hidden',
-                        'value' => s($value))) .
-                        html_writer::empty_tag('input', array(
-                        'type' => 'hidden',
-                        'name' => $qa->get_qt_field_name($fieldname),
-                        'value' => s($cleanvalue)));
-            } else {
-                $output .= html_writer::empty_tag('input', array(
-                        'type' => 'hidden',
-                        'id' => $this->box_id($qa, 'p' . $place, $group) . '_hidden',
-                        'name' => $qa->get_qt_field_name($fieldname),
-                        'value' => s($value)));
-            }
-        }
-        return $output;
     }
 
     public function correct_response(question_attempt $qa) {

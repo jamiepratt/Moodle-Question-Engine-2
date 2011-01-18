@@ -17,7 +17,7 @@
 
 
 /**
- * Defines the editing form for the drag-and-drop words into sentences question type.
+ * Defines the editing form for the select from drop down list question type.
  *
  * @package qtype_sddl
  * @copyright 2009 The Open University
@@ -26,7 +26,7 @@
 
 
 /**
- * Drag-and-drop words into sentences editing form definition.
+ * Select from drop down list question editing form definition.
  *
  * @copyright 2009 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -114,8 +114,7 @@ class question_edit_sddl_form extends question_edit_form {
             $options[$i] = $i;
         }
 
-        $grouparray[] =& $mform->createElement('select', 'draggroup', get_string('group', 'qtype_sddl'), $options);
-        $grouparray[] =& $mform->createElement('checkbox', 'infinite', ' ', get_string('infinite', 'qtype_sddl'), null, array('size'=>1, 'class'=>'tweakcss'));
+        $grouparray[] =& $mform->createElement('select', 'selectgroup', get_string('group', 'qtype_sddl'), $options);
         $textboxgroup[] = $mform->createElement('group','choices', 'Choice {no}',$grouparray);
 
         if (isset($this->question->options)) {
@@ -132,8 +131,7 @@ class question_edit_sddl_form extends question_edit_form {
         }
 
         $repeatedoptions = array();
-        $repeatedoptions['draggroup']['default'] = '1';
-        $repeatedoptions['infinite']['default'] = 0;
+        $repeatedoptions['selectgroup']['default'] = '1';
         $mform->setType('answer', PARAM_RAW);
         $this->repeat_elements($textboxgroup, $repeatsatstart, $repeatedoptions, 'noanswers', 'addanswers', QUESTION_NUMANS_ADD, get_string('addmorechoiceblanks', 'qtype_sddl'));
     }
@@ -144,13 +142,8 @@ class question_edit_sddl_form extends question_edit_form {
             if (count($options->answers)) {
                 $key = 0;
                 foreach ($options->answers as $answer) {
-                    $feedback = unserialize( $answer->feedback);
-                    $draggroup = $feedback->draggroup;
-                    $infinite = $feedback->infinite;
-
                     $default_values['choices['.$key.'][answer]'] = $answer->answer;
-                    $default_values['choices['.$key.'][draggroup]'] = $draggroup;
-                    $default_values['choices['.$key.'][infinite]'] = $infinite;
+                    $default_values['choices['.$key.'][selectgroup]'] = $answer->feedback;
                     $key++;
                 }
             }
