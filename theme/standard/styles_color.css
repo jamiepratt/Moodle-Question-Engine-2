@@ -1137,7 +1137,8 @@ table.quizreviewsummary td.cell {
   border: 1px solid #666;
 }
 #quiznavigation .qnbutton.notyetanswered,
-#quiznavigation .qnbutton.requiresgrading {
+#quiznavigation .qnbutton.requiresgrading,
+#quiznavigation .qnbutton.invalidanswer {
   background-color: white;
 }
 #quiznavigation .qnbutton.correct {
