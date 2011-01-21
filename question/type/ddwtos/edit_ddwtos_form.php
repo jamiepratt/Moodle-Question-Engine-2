@@ -33,7 +33,7 @@ require_once($CFG->dirroot . '/question/type/sddl/eeinq_form.php');
  * @copyright 2009 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class question_edit_ddwtos extends eeinq_form {
+class question_edit_ddwtos_form extends eeinq_form {
 
     function qtype() {
         return 'ddwtos';
@@ -45,15 +45,25 @@ class question_edit_ddwtos extends eeinq_form {
         $infinite = $feedback->infinite;
 
         $default_values = array();
-        $default_values['choices['.$key.'][selectgroup]'] = $draggroup;
+        $default_values['choices['.$key.'][draggroup]'] = $draggroup;
         $default_values['choices['.$key.'][infinite]'] = $infinite;
         return $default_values;
     }
 
     protected function repeated_options(){
         $repeatedoptions = array();
-        $repeatedoptions['selectgroup']['default'] = '1';
+        $repeatedoptions['draggroup']['default'] = '1';
         $repeatedoptions['infinite']['default'] = 0;
         return $repeatedoptions;
+    }
+
+    protected function choice_group(&$mform, $grouparray){
+        $options = array();
+        for ($i = 1; $i <= 8; $i += 1) {
+            $options[$i] = $i;
+        }
+        $grouparray[] =& $mform->createElement('select', 'draggroup', get_string('group', 'qtype_ddwtos'), $options);
+        $grouparray[] =& $mform->createElement('checkbox', 'infinite', ' ', get_string('infinite', 'qtype_ddwtos'), null, array('size'=>1, 'class'=>'tweakcss'));
+        return $grouparray;
     }
 }

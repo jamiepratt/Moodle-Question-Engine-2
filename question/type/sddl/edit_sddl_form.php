@@ -33,7 +33,7 @@ require_once($CFG->dirroot . '/question/type/sddl/eeinq_form.php');
  * @copyright 2009 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class question_edit_sddl extends eeinq_form {
+class question_edit_sddl_form extends eeinq_form {
 
     // HTML tags allowed in answers (choices).
     protected $allowedhtmltags = array();
@@ -52,5 +52,13 @@ class question_edit_sddl extends eeinq_form {
         $repeatedoptions = array();
         $repeatedoptions['selectgroup']['default'] = '1';
         return $repeatedoptions;
+    }
+    protected function choice_group(&$mform, $grouparray){
+        $options = array();
+        for ($i = 1; $i <= 8; $i += 1) {
+            $options[$i] = $i;
+        }
+        $grouparray[] =& $mform->createElement('select', 'selectgroup', get_string('group', 'qtype_sddl'), $options);
+        return $grouparray;
     }
 }

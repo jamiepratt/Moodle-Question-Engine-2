@@ -85,12 +85,7 @@ class eeinq_form extends question_edit_form {
         $grouparray[] =& $mform->createElement('text', 'answer', get_string('answer', 'qtype_sddl'), array('size'=>30, 'class'=>'tweakcss'));
         $grouparray[] =& $mform->createElement('static', '', '',' '.get_string('group', 'qtype_sddl').' ');
 
-        $options = array();
-        for ($i = 1; $i <= 8; $i += 1) {
-            $options[$i] = $i;
-        }
-
-        $grouparray[] =& $mform->createElement('select', 'selectgroup', get_string('group', 'qtype_sddl'), $options);
+        $grouparray = $this->choice_group($mform, $grouparray);
         $textboxgroup[] = $mform->createElement('group','choices', 'Choice {no}',$grouparray);
 
         if (isset($this->question->options)) {
