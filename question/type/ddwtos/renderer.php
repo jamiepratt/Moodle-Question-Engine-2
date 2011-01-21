@@ -24,6 +24,8 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+require_once($CFG->dirroot . '/question/type/sddl/eeinq_renderer.php');
+
 
 /**
  * Generates the output for drag-and-drop words into sentences questions.
@@ -31,45 +33,28 @@
  * @copyright 2010 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class qtype_ddwtos_renderer extends qtype_with_combined_feedback_renderer {
-    public function formulation_and_controls(question_attempt $qa,
-            question_display_options $options) {
+class qtype_ddwtos_renderer extends qtype_elements_embedded_in_question_text_renderer {
 
+    protected function qtext_classname(){
+        return 'qtext ddwtos_questionid_for_javascript';
+    }
+
+    protected function post_qtext_elements(question_attempt $qa, question_display_options $options){
+        $result = '';
         $question = $qa->get_question();
-
-        $questiontext = '';
-        foreach ($question->textfragments as $i => $fragment) {
-            if ($i > 0) {
-                $questiontext .= $this->drop_box($qa, $i, $options);
-            }
-            $questiontext .= $fragment;
-        }
-
         $dragboxs = '';
         foreach ($question->choices as $group => $choices) {
             $dragboxs .= $this->drag_boxes($qa, $group,
                     $question->get_ordered_choices($group), $options);
         }
-
-        $result = '';
-        $result .= html_writer::tag('div', $question->format_text($questiontext),
-                array('class' => 'qtext ddwtos_questionid_for_javascript', 'id' => $qa->get_qt_field_name('')));
         $result .= html_writer::tag('div', $dragboxs,
                 array('class' => 'answercontainer'));
-
         // We abuse the clear_wrong method to output the hidden form fields we
         // want irrespective of whether we are actually clearing the wrong
         // bits of the response.
         if (!$options->clearwrong) {
             $result .= $this->clear_wrong($qa, false);
         }
-
-        if ($qa->get_state() == question_state::$invalid) {
-            $result .= html_writer::nonempty_tag('div',
-                    $question->get_validation_error($qa->get_last_qt_data()),
-                    array('class' => 'validationerror'));
-        }
-
         return $result;
     }
 
@@ -83,7 +68,7 @@ class qtype_ddwtos_renderer extends qtype_with_combined_feedback_renderer {
         return '<sub>&#160;</sub>' . $string . '<sup>&#160;</sup>';
     }
 
-    protected function drop_box(question_attempt $qa, $place, question_display_options $options) {
+    protected function embedded_element(question_attempt $qa, $place, question_display_options $options) {
         $question = $qa->get_question();
         $group = $question->places[$place];
         $boxcontents = $this->dodgy_ie_fix('&#160;');
@@ -140,13 +125,6 @@ class qtype_ddwtos_renderer extends qtype_with_combined_feedback_renderer {
         return html_writer::nonempty_tag('div', $boxes, array('class' => 'answertext'));
     }
 
-    protected function box_id(question_attempt $qa, $place, $group) {
-        return $qa->get_qt_field_name($place) . '_' . $group;
-    }
-
-    public function specific_feedback(question_attempt $qa) {
-        return $this->combined_feedback($qa);
-    }
 
     public function head_code(question_attempt $qa) {
         require_js(array('yui_dom-event', 'yui_dragdrop'));
@@ -200,22 +178,4 @@ class qtype_ddwtos_renderer extends qtype_with_combined_feedback_renderer {
         return $output;
     }
 
-    public function correct_response(question_attempt $qa) {
-        $question = $qa->get_question();
-
-        $correctanswer = '';
-        foreach ($question->textfragments as $i => $fragment) {
-            if ($i > 0) {
-                $group = $question->places[$i];
-                $choice = $question->choices[$group][$question->rightchoices[$i]];
-                $correctanswer .= '[' . str_replace('-', '&#x2011;',
-                        $choice->text) . ']';
-            }
-            $correctanswer .= $fragment;
-        }
-
-        if (!empty($correctanswer)) {
-            return get_string('correctansweris', 'qtype_ddwtos', $correctanswer);
-        }
-    }
 }

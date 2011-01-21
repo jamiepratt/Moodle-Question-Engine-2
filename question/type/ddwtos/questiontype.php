@@ -38,6 +38,10 @@ require_once($CFG->dirroot . '/question/format/xml/format.php');
  */
 class qtype_ddwtos extends question_type {
 
+    function requires_qtypes() {
+        return array('sddl');
+    }
+
     protected function serialize_draggroup_infinite($draggroup, $infinite){
         $output = new stdClass;
         $output->draggroup = $draggroup;

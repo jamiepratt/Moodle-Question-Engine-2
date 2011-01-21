@@ -24,6 +24,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+require_once($CFG->dirroot . '/question/type/sddl/eeinq_renderer.php');
 
 /**
  * Generates the output for select from drop down list questions.
@@ -31,38 +32,8 @@
  * @copyright 2010 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class qtype_sddl_renderer extends qtype_with_combined_feedback_renderer {
-    public function formulation_and_controls(question_attempt $qa,
-            question_display_options $options) {
-
-        $question = $qa->get_question();
-
-        $questiontext = '';
-        foreach ($question->textfragments as $i => $fragment) {
-            if ($i > 0) {
-                $questiontext .= $this->select_box($qa, $i, $options);
-            }
-            $questiontext .= $fragment;
-        }
-
-
-        $result = '';
-        $result .= html_writer::tag('div', $question->format_text($questiontext),
-                array('class' => 'qtext', 'id' => $qa->get_qt_field_name('')));
-
-
-
-        if ($qa->get_state() == question_state::$invalid) {
-            $result .= html_writer::nonempty_tag('div',
-                    $question->get_validation_error($qa->get_last_qt_data()),
-                    array('class' => 'validationerror'));
-        }
-
-        return $result;
-    }
-
-
-    protected function select_box(question_attempt $qa, $place, question_display_options $options) {
+class qtype_sddl_renderer extends qtype_elements_embedded_in_question_text_renderer  {
+    protected function embedded_element(question_attempt $qa, $place, question_display_options $options) {
         $question = $qa->get_question();
         $group = $question->places[$place];
 
@@ -98,32 +69,4 @@ class qtype_sddl_renderer extends qtype_with_combined_feedback_renderer {
         return html_writer::select($selectoptions, $qa->get_qt_field_name($fieldname), $value, ' ', $attributes) . ' ' . $feedbackimage;
     }
 
-
-
-    protected function box_id(question_attempt $qa, $place, $group) {
-        return $qa->get_qt_field_name($place) . '_' . $group;
-    }
-
-    public function specific_feedback(question_attempt $qa) {
-        return $this->combined_feedback($qa);
-    }
-
-    public function correct_response(question_attempt $qa) {
-        $question = $qa->get_question();
-
-        $correctanswer = '';
-        foreach ($question->textfragments as $i => $fragment) {
-            if ($i > 0) {
-                $group = $question->places[$i];
-                $choice = $question->choices[$group][$question->rightchoices[$i]];
-                $correctanswer .= '[' . str_replace('-', '&#x2011;',
-                        $choice->text) . ']';
-            }
-            $correctanswer .= $fragment;
-        }
-
-        if (!empty($correctanswer)) {
-            return get_string('correctansweris', 'qtype_sddl', $correctanswer);
-        }
-    }
 }
