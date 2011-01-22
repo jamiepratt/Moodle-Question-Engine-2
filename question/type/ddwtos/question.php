@@ -53,4 +53,7 @@ class qtype_ddwtos_choice {
         $this->draggroup = $draggroup;
         $this->isinfinite = $isinfinite;
     }
+    public function choice_group(){
+        return $this->draggroup;
+    }
 }
