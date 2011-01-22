@@ -45,7 +45,7 @@ class qtype_elements_embedded_in_question_text_renderer extends qtype_with_combi
     }
 
     protected function post_qtext_elements(question_attempt $qa, question_display_options $options){
-        return $result;
+        return '';
     }
 
     protected function box_id(question_attempt $qa, $place, $group) {
