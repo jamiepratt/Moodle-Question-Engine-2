@@ -974,10 +974,12 @@ function quiz_get_reviewoptions($quiz, $attempt, $context) {
         $options->correctness = question_display_options::VISIBLE;
         $options->marks = question_display_options::MARK_AND_MAX;
         $options->feedback = question_display_options::VISIBLE;
+        $options->numpartscorrect = question_display_options::VISIBLE;
         $options->generalfeedback = question_display_options::VISIBLE;
         $options->rightanswer = question_display_options::VISIBLE;
         $options->overallfeedback = question_display_options::VISIBLE;
         $options->history = question_display_options::VISIBLE;
+
     }
 
     return $options;
