@@ -770,7 +770,7 @@ ORDER BY
             ) lateststepid ON lateststepid.questionattemptid = qa.id
             JOIN {$CFG->prefix}question_attempt_steps qas ON qas.id = lateststepid.latestid
             WHERE qa.questionusageid = $qubaid
-            HAVING COUNT(CASE WHEN qas.state = 'needsgrading' THEN 1 ELSE NULL END) = 0";
+            HAVING COUNT(CASE WHEN qas.state = 'needsgrading' AND qa.maxmark > 0 THEN 1 ELSE NULL END) = 0";
     }
 
     public function question_attempt_latest_state_view($alias) {

@@ -98,13 +98,13 @@ class quiz_report_overview_table extends quiz_attempt_report_table {
             $gradeaverages = array();
         }
         foreach ($this->questions as $question) {
-            if (isset($gradeaverages[$question->slot])) {
+            if (isset($gradeaverages[$question->slot]) && $question->maxmark > 0) {
                 $record = $gradeaverages[$question->slot];
                 $record->grade = quiz_rescale_grade($record->averagefraction * $question->maxmark, $this->quiz, false);
             } else {
                 $record = new stdClass;
                 $record->grade = null;
-                $record->numaveraged = 0;
+                $record->numaveraged = null;
             }
             $row['qsgrade' . $question->slot] = $this->format_average($record, true);
         }
@@ -126,6 +126,8 @@ class quiz_report_overview_table extends quiz_attempt_report_table {
 
         if ($this->download) {
             return $average;
+        } else if (is_null($record->numaveraged)) {
+            return '<span class="avgcell"><span class="average">' . $average . '</span></span>';
         } else {
             return '<span class="avgcell"><span class="average">' . $average . '</span> <span class="count">(' .
                     $record->numaveraged . ')</span></span>';
@@ -221,7 +223,9 @@ class quiz_report_overview_table extends quiz_attempt_report_table {
         $stepdata = $this->lateststeps[$attempt->usageid][$slot];
         $state = question_state::get($stepdata->state);
 
-        if (is_null($stepdata->fraction)) {
+        if ($question->maxmark == 0) {
+            $grade = '-';
+        } else if (is_null($stepdata->fraction)) {
             if ($state == question_state::$needsgrading) {
                 $grade = get_string('requiresgrading', 'question');
             } else {
