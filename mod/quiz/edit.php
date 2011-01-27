@@ -109,6 +109,7 @@
     }
 
     list($thispageurl, $contexts, $cmid, $cm, $quiz, $pagevars) = question_edit_setup('editq', true);
+    $quiz->questions = quiz_clean_layout($quiz->questions);
 
     //these params are only passed from page request to request while we stay on this page
     //otherwise they would go in question_edit_setup

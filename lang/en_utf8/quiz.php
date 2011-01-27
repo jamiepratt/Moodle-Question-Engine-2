@@ -116,6 +116,7 @@ $string['cannotsavenumberofquestion'] = 'Could not save number of questions per 
 $string['cannotsavequestion'] = 'Cannot save question list';
 $string['cannotsetgrade'] = 'Could not set a new maximum grade for the quiz';
 $string['cannotsetsumgrades'] = 'Failed to set sumgrades';
+$string['cannotstartmissingquestion'] = 'Cannot start an attempt at this quiz. The quiz definition includes a question that does not exist.';
 $string['cannotwrite'] = 'Cannot write to export file ($a)';
 $string['caseno'] = 'No, case is unimportant';
 $string['casesensitive'] = 'Case sensitivity';

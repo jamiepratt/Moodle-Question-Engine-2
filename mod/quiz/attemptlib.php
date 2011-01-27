@@ -79,13 +79,7 @@ class quiz {
         if ($getcontext && !empty($cm->id)) {
             $this->context = get_context_instance(CONTEXT_MODULE, $cm->id);
         }
-        $this->questionids = array();
-        $ids = explode(',', $this->quiz->questions);
-        foreach ($ids as $id) {
-            if ($id) {
-                $this->questionids[] = $id;
-            }
-        }
+        $this->questionids = explode(',', quiz_questions_in_quiz($this->quiz->questions));
     }
 
     /**
@@ -131,7 +125,9 @@ class quiz {
         }
         $questionstoprocess = array();
         foreach ($questionids as $id) {
-            $questionstoprocess[$id] = $this->questions[$id];
+            if (array_key_exists($id, $this->questions)) {
+                $questionstoprocess[$id] = $this->questions[$id];
+            }
         }
         if (!get_question_options($questionstoprocess)) {
             throw new moodle_quiz_exception($this, 'loadingquestionsfailed', implode(', ', $questionids));
@@ -219,6 +215,9 @@ class quiz {
         }
         $questions = array();
         foreach ($questionids as $id) {
+            if (!array_key_exists($id, $this->questions)) {
+                throw new moodle_exception('cannotstartmissingquestion', 'quiz', $this->view_url());
+            }
             $questions[$id] = $this->questions[$id];
             $this->ensure_question_loaded($id);
         }

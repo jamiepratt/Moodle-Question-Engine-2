@@ -219,20 +219,26 @@ function quiz_print_question_list($quiz, $pageurl, $allowdelete=true, $showbreak
     echo "</tr>\n";
 
 	// for RTL languages: switch right and left arrows /****/
-    if (right_to_left()) { 
-        $movearrow = 'moveleft.gif'; 
-    } else { 
-        $movearrow = 'removeright.gif'; 
-    } 
+    if (right_to_left()) {
+        $movearrow = 'moveleft.gif';
+    } else {
+        $movearrow = 'removeright.gif';
+    }
 
-    foreach ($order as $i => $qnum) {
-
-        if ($qnum and empty($questions[$qnum])) {
-            continue;
-        }
+    foreach ($order as $count => $qnum) {
 
         // If the questiontype is missing change the question type
-        if ($qnum and !array_key_exists($questions[$qnum]->qtype, $QTYPES)) {
+        if ($qnum && !array_key_exists($qnum, $questions)) {
+            $fakequestion = new stdClass();
+            $fakequestion->id = 0;
+            $fakequestion->qtype = 'missingtype';
+            $fakequestion->name = get_string('deletedquestion', 'qtype_missingtype');
+            $fakequestion->questiontext = '<p>' . get_string('deletedquestion', 'qtype_missing') . '</p>';
+            $fakequestion->length = 0;
+            $questions[$qnum] = $fakequestion;
+            $quiz->grades[$qnum] = 0;
+
+        } else if ($qnum and !array_key_exists($questions[$qnum]->qtype, $QTYPES)) {
             $questions[$qnum]->qtype = 'missingtype';
         }
 
@@ -240,9 +246,9 @@ function quiz_print_question_list($quiz, $pageurl, $allowdelete=true, $showbreak
         // But don't show it in front of pagebreaks if they are hidden.
         if ($reordertool) {
             if ($qnum or $showbreaks) {
-                echo '<tr><td><input type="text" name="o'.$i.'" size="2" value="'.(10*$count+10).'" /></td>';
+                echo '<tr><td><input type="text" name="o'.$count.'" size="2" value="'.(10*$count+10).'" /></td>';
             } else {
-                echo '<tr><td><input type="hidden" name="o'.$i.'" size="2" value="'.(10*$count+10).'" /></td>';
+                echo '<tr><td><input type="hidden" name="o'.$count.'" size="2" value="'.(10*$count+10).'" /></td>';
             }
         } else {
             echo '<tr><td></td>';
@@ -270,7 +276,6 @@ function quiz_print_question_list($quiz, $pageurl, $allowdelete=true, $showbreak
                 echo '</td></tr></table></td>';
                 echo '<td colspan="2">&nbsp;</td>';
             }
-            $count++;
             // missing </tr> here, if loop is broken, need to close the </tr>
             echo "</tr>";
             continue;
@@ -311,27 +316,26 @@ function quiz_print_question_list($quiz, $pageurl, $allowdelete=true, $showbreak
         }
         echo '</td><td align="center">';
 
-        if (($question->qtype != 'random')) {
+        if (($question->qtype != 'random') && !empty($question->id)) {
             $question->maxmark = $quiz->grades[$qnum];
             echo quiz_question_preview_button($quiz, $question);
         }
         $returnurl = $pageurl->out();
         $questionparams = array('returnurl' => $returnurl, 'cmid'=>$quiz->cmid, 'id' => $question->id);
         $questionurl = new moodle_url("$CFG->wwwroot/question/question.php", $questionparams);
-        if (question_has_capability_on($question, 'edit', $question->category) || question_has_capability_on($question, 'move', $question->category)) {
+        if (!empty($question->id) && (question_has_capability_on($question, 'edit', $question->category) || question_has_capability_on($question, 'move', $question->category))) {
             echo "<a title=\"$stredit\" href=\"".$questionurl->out()."\">
                     <img src=\"$CFG->pixpath/t/edit.gif\" class=\"iconsmall\" alt=\"$stredit\" /></a>";
-        } elseif (question_has_capability_on($question, 'view', $question->category)){
+        } else if (!empty($question->id) && question_has_capability_on($question, 'view', $question->category)){
             echo "<a title=\"$strview\" href=\"".$questionurl->out(false, array('id'=>$question->id))."\"><img
                     src=\"$CFG->pixpath/i/info.gif\" alt=\"$strview\" /></a>&nbsp;";
         }
-        if ($allowdelete && question_has_capability_on($question, 'use', $question->category)) { // remove from quiz, not question delete.
+        if ($allowdelete && (empty($question->id) || question_has_capability_on($question, 'use', $question->category))) { // remove from quiz, not question delete.
             echo "<a title=\"$strremove\" href=\"".$pageurl->out_action(array('delete'=>$count))."\">
                     <img src=\"$CFG->pixpath/t/$movearrow\" class=\"iconsmall\" alt=\"$strremove\" /></a>";
         }
 
         echo "</td></tr>";
-        $count++;
         $sumgrade += $quiz->grades[$qnum];
     }
 
