@@ -198,7 +198,7 @@ class qtype_eeinq extends question_type {
     protected function get_array_of_choices($question) {
         $subquestions = $question->options->answers;
         $count = 0;
-        foreach ($subquestions as $key=>$subquestion){
+        foreach ($subquestions as $key=>$subquestion) {
             $answers[$count]['id'] = $subquestion->id;
             $answers[$count]['answer'] = $subquestion->answer;
             $answers[$count]['fraction'] = $subquestion->fraction;
@@ -218,9 +218,9 @@ class qtype_eeinq extends question_type {
     protected function get_array_of_groups($question, $state) {
         $answers = $this->get_array_of_choices($question);
         $arr = array();
-        for($group=1;$group<count($answers);$group++){
+        for($group=1;$group<count($answers);$group++) {
             $players = $this->get_group_of_players ($question, $state, $answers, $group);
-            if($players){
+            if($players) {
                 $arr [$group]= $players;
             }
         }
@@ -232,14 +232,14 @@ class qtype_eeinq extends question_type {
      * @param object $question
      * @return array of groups
      */
-    protected function get_correct_answers($question){
+    protected function get_correct_answers($question) {
         $arrayofchoices = $this->get_array_of_choices($question);
         $arrayofplaceholdeers = $this->get_array_of_placeholders($question);
 
         $correctplayeers = array();
-        foreach($arrayofplaceholdeers as $ph){
-            foreach($arrayofchoices as $key=>$choice){
-                if(($key+1) == $ph){
+        foreach($arrayofplaceholdeers as $ph) {
+            foreach($arrayofchoices as $key=>$choice) {
+                if(($key+1) == $ph) {
                     $correctplayeers[]= $choice;
                 }
             }
@@ -250,7 +250,7 @@ class qtype_eeinq extends question_type {
     protected function get_array_of_placeholders($question) {
         $qtext = $question->questiontext;
         $error = '<b> ERROR</b>: Please check the form for this question. ';
-        if(!$qtext){
+        if(!$qtext) {
             echo $error . 'The question text is empty!';
             return false;
         }
@@ -258,22 +258,22 @@ class qtype_eeinq extends question_type {
         //get the slots
         $slots = $this->getEmbeddedTextArray($question);
 
-        if(!$slots){
+        if(!$slots) {
             echo $error . 'The question text is not in the correct format!';
             return false;
         }
 
         $output = array();
-        foreach ($slots as $slot){
+        foreach ($slots as $slot) {
             $output[]=substr($slot, 2, (strlen($slot)-4));//2 is for'[[' and 4 is for '[[]]'
         }
         return $output;
      }
 
-    protected function get_group_of_players ($question, $state, $subquestions, $group){
+    protected function get_group_of_players ($question, $state, $subquestions, $group) {
         $goupofanswers=array();
         foreach($subquestions as $key=>$subquestion) {
-            if($subquestion[$this->choice_group_key()] == $group){
+            if($subquestion[$this->choice_group_key()] == $group) {
                 $goupofanswers[] =  $subquestion;
             }
         }

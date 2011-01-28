@@ -52,7 +52,7 @@ class qtype_sddl_choice {
         $this->selectgroup = $selectgroup;
     }
 
-    public function choice_group(){
+    public function choice_group() {
         return $this->selectgroup;
     }
 }

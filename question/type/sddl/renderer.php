@@ -32,7 +32,7 @@ require_once($CFG->dirroot . '/question/type/sddl/eeinq_renderer.php');
  * @copyright 2010 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class qtype_sddl_renderer extends qtype_elements_embedded_in_question_text_renderer  {
+class qtype_sddl_renderer extends qtype_elements_embedded_in_question_text_renderer {
     protected function embedded_element(question_attempt $qa, $place, question_display_options $options) {
         $question = $qa->get_question();
         $group = $question->places[$place];
@@ -52,7 +52,7 @@ class qtype_sddl_renderer extends qtype_elements_embedded_in_question_text_rende
 
         $orderedchoices = $question->get_ordered_choices($group);
         $selectoptions = array();
-        foreach ($orderedchoices as $orderedchoicevalue => $orderedchoice){
+        foreach ($orderedchoices as $orderedchoicevalue => $orderedchoice) {
             $selectoptions[$orderedchoicevalue] = $orderedchoice->text;
         }
 

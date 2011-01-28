@@ -36,15 +36,13 @@ class qtype_elements_embedded_in_question_text_renderer extends qtype_with_combi
         return $result;
     }
 
-    protected function qtext_classname(){
+    protected function qtext_classname() {
         return 'qtext';
     }
 
-    protected function embedded_element(question_attempt $qa, $place, question_display_options $options) {
-        return '';
-    }
+    protected abstract function embedded_element(question_attempt $qa, $place, question_display_options $options);
 
-    protected function post_qtext_elements(question_attempt $qa, question_display_options $options){
+    protected function post_qtext_elements(question_attempt $qa, question_display_options $options) {
         return '';
     }
 

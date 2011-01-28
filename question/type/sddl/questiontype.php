@@ -39,20 +39,20 @@ require_once($CFG->dirroot . '/question/type/sddl/eeinq_questiontype.php');
  */
 class qtype_sddl extends qtype_eeinq {
 
-    protected function feedback_serialization($choice){
+    protected function feedback_serialization($choice) {
         return $choice['selectgroup'];
     }
 
-    protected function feedback_unserialization($choicedata){
+    protected function feedback_unserialization($choicedata) {
         return new qtype_sddl_choice($choicedata->answer, $choicedata->feedback);
     }
 
-    protected function feedback_unserialize_as_array($feedback){
+    protected function feedback_unserialize_as_array($feedback) {
         return array('selectgroup'=> $feedback);
     }
 
 
-    protected function choice_group_key(){
+    protected function choice_group_key() {
         return 'selectgroup';
     }
 

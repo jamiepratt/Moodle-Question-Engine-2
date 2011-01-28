@@ -42,18 +42,18 @@ class question_edit_sddl_form extends eeinq_form {
         return 'sddl';
     }
 
-    protected function default_values_from_feedback_field($feedback, $key){
+    protected function default_values_from_feedback_field($feedback, $key) {
         $default_values = array();
         $default_values['choices['.$key.'][selectgroup]'] = $feedback;
         return $default_values;
     }
 
-    protected function repeated_options(){
+    protected function repeated_options() {
         $repeatedoptions = array();
         $repeatedoptions['selectgroup']['default'] = '1';
         return $repeatedoptions;
     }
-    protected function choice_group(&$mform, $grouparray){
+    protected function choice_group(&$mform, $grouparray) {
         $options = array();
         for ($i = 1; $i <= 8; $i += 1) {
             $options[$i] = $i;

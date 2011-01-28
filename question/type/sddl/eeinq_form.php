@@ -9,7 +9,7 @@
  */
 class eeinq_form extends question_edit_form {
 
-    // HTML tags allowed in answers (choices).
+    /** @var array of HTML tags allowed in choices / drag boxes. */
     protected $allowedhtmltags = array(
         'sub',
         'sup',
@@ -19,13 +19,14 @@ class eeinq_form extends question_edit_form {
         'strong'
     );
 
-    //match all start tags including attributes in the tags
+    /** @var string regex to match HTML open tags. */
     private $htmltstarttagsandattributes = '/<\s*\w.*?>/';
 
-    //match all close tags
-    private $htmltclosetags = "/<\s*\/\s*\w\s*.*?>|<\s*br\s*>/";
+    /** @var string regex to match HTML close tags or br. */
+    private $htmltclosetags = '~<\s*/\s*\w\s*.*?>|<\s*br\s*>~';
 
-    private $squareBracketsRegex = "/\[\[[^]]*?\\]]/";  // will select text like:  [[cat]]   (including the square brackets)
+    /** @var string regex to select text like [[cat]] (including the square brackets). */
+    private $squareBracketsRegex = '/\[\[[^]]*?\]\]/';  
 
     private function get_html_tags($text) {
         $textarray = array();
@@ -150,21 +151,21 @@ class eeinq_form extends question_edit_form {
                 continue;
             }
             if ($validtags) {
-                $errors['choices['.$key.']']= $validtags;
+                $errors['choices['.$key.']'] = $validtags;
             }
         }
         return $errors;
     }
 
-    private function validate_slots($questionText, $choices) {
+    private function validate_slots($questiontext, $choices) {
         $error = 'Please check the Question text: ';
-        if (!$questionText) {
+        if (!$questiontext) {
             return $error . 'The question text is empty!';
         }
 
-        $embeddedTextArray = array();
-        preg_match_all($this->squareBracketsRegex, $questionText, $embeddedTextArray);
-        $slots = $embeddedTextArray[0]; // see doc for preg_match_all() to explain this
+        $matches = array();
+        preg_match_all($this->squareBracketsRegex, $questiontext, $matches);
+        $slots = $matches[0];
 
         if (!$slots) {
             return $error . 'The question text is not in the correct format!';
@@ -199,12 +200,12 @@ class eeinq_form extends question_edit_form {
         return '';
     }
 
-    protected function default_values_from_feedback_field($feedback, $key){
+    protected function default_values_from_feedback_field($feedback, $key) {
         $default_values = array();
         return $default_values;
     }
 
-    protected function repeated_options(){
+    protected function repeated_options() {
         $repeatedoptions = array();
         return $repeatedoptions;
     }
