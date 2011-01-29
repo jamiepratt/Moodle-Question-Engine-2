@@ -20,7 +20,7 @@
  * Unit tests for the selection from drop down list question definition class.
  *
  * @package qtype_sddl
- * @copyright 2010 The Open University
+ * @copyright 2011 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

@@ -20,7 +20,7 @@
  * Select from drop down list question renderer class.
  *
  * @package qtype_sddl
- * @copyright 2010 The Open University
+ * @copyright 2011 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -29,7 +29,7 @@ require_once($CFG->dirroot . '/question/type/sddl/eeinq_renderer.php');
 /**
  * Generates the output for select from drop down list questions.
  *
- * @copyright 2010 The Open University
+ * @copyright 2011 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_sddl_renderer extends qtype_elements_embedded_in_question_text_renderer {

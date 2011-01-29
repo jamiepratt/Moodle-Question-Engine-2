@@ -3,7 +3,7 @@
  * Generates the output for question types where the question includes embedded interactive elements in the
  * question text.
  *
- * @copyright 2010 The Open University
+ * @copyright 2011 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_elements_embedded_in_question_text_renderer extends qtype_with_combined_feedback_renderer {
