@@ -57,7 +57,7 @@ class qtype_gapselect extends qtype_gapselect_base {
         return 'selectgroup';
     }
 
-    function import_from_xml($data, $question, $format, $extra=null) {
+    public function import_from_xml($data, $question, $format, $extra=null) {
         if (!isset($data['@']['type']) || $data['@']['type'] != 'gapselect') {
             return false;
         }
@@ -77,7 +77,7 @@ class qtype_gapselect extends qtype_gapselect_base {
             foreach ($data['#']['selectoption'] as $selectoptionxml) {
                 $question->choices[] = array(
                     'answer' => $format->getpath($selectoptionxml, array('#', 'text', 0, '#'), '', true),
-                    'selectgroup' => $format->getpath($selectoptionxml, array('#', 'group', 0, '#'), 1),
+                    'choicegroup' => $format->getpath($selectoptionxml, array('#', 'group', 0, '#'), 1),
                 );
             }
 
@@ -87,7 +87,7 @@ class qtype_gapselect extends qtype_gapselect_base {
                 $ans = $format->import_answer($answerxml);
                 $question->choices[] = array(
                     'answer' => $ans->answer,
-                    'selectgroup' => $ans->feedback,
+                    'choicegroup' => $ans->feedback,
                 );
             }
         }
@@ -98,7 +98,7 @@ class qtype_gapselect extends qtype_gapselect_base {
         return $question;
     }
 
-    function export_to_xml($question, $format, $extra = null) {
+    public function export_to_xml($question, $format, $extra = null) {
         $output = '';
 
         $output .= '    <shuffleanswers>' . $question->options->shuffleanswers . "</shuffleanswers>\n";
