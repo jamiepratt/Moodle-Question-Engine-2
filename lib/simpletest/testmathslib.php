@@ -76,6 +76,21 @@ class mathsslib_test extends UnitTestCase {
         $this->assertEqual($res, 60, 'sum is: %s');
     }
 
+    /**
+     * Tests some slightly more complex expressions
+     */
+    function test__more_complex_expressions() {
+        $formula = new calc_formula('=pi() + a', array('a'=>10));
+        $res = $formula->evaluate();
+        $this->assertEqual($res, pi()+10);
+        $formula = new calc_formula('=pi()^a', array('a'=>10));
+        $res = $formula->evaluate();
+        $this->assertEqual($res, pow(pi(),10));
+        $formula = new calc_formula('=-8*(5/2)^2*(1-sqrt(4))-8');
+        $res = $formula->evaluate();
+        $this->assertEqual($res, -8*pow((5/2),2)*(1-sqrt(4))-8);
+    }
+
 }
 
 
