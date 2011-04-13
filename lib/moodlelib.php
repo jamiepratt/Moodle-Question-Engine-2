@@ -7023,6 +7023,8 @@ function get_core_subsystems() {
             'iso6392'     => NULL,
             'langconfig'  => NULL,
             'license'     => NULL,
+            'mathslib'    => NULL,
+            'message'     => 'message',
             'message'     => 'message',
             'mimetypes'   => NULL,
             'mnet'        => 'mnet',
