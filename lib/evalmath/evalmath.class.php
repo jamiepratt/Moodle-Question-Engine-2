@@ -179,6 +179,14 @@ class EvalMath {
         return $output;
     }
 
+    /**
+     * @param string $name
+     * @return boolean Is this a valid var or function name?
+     */
+    public static function is_valid_var_or_func_name($name){
+        return preg_match('/'.self::$namepat.'$/iA', $name);
+    }
+
     //===================== HERE BE INTERNAL METHODS ====================\\
 
     // Convert infix to postfix notation
@@ -432,13 +440,6 @@ class EvalMath {
         return false;
     }
 
-    /**
-     * @param string $name
-     * @return boolean Is this a valid var or function name?
-     */
-    public static function is_valid_var_or_func_name($name){
-        return preg_match('/'.self::$namepat.'$/iA', $name);
-    }
 }
 
 // for internal use
