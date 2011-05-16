@@ -194,7 +194,7 @@ class quiz_report_statistics_table extends flexible_table {
 
         if ($extraurlparam) {
             $name = '<a title="' . get_string('detailedanalysis', 'quiz_statistics') .
-                    '" href="' . $this->baseurl . $extraurlparam . '">' . $name . '</a>';
+                    '" href="' . $this->baseurl . '&amp;' . $extraurlparam . '">' . $name . '</a>';
         }
 
         if ($this->is_dubious_question($question)) {
