@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -563,8 +562,6 @@ class qformat_gift_test extends UnitTestCase {
             'options' => (object) array(
                 'id' => 123,
                 'question' => 666,
-                'instructions' => '',
-                'instructionsformat' => FORMAT_MOODLE,
                 'showunits' => 0,
                 'unitsleft' => 0,
                 'showunits' => 2,

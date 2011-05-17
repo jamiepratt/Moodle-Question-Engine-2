@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -102,7 +101,8 @@ class qtype_shortanswer_question extends question_graded_by_strategy
         return preg_match($regexp, trim($string));
     }
 
-    public function check_file_access($qa, $options, $component, $filearea, $args, $forcedownload) {
+    public function check_file_access($qa, $options, $component, $filearea,
+            $args, $forcedownload) {
         if ($component == 'question' && $filearea == 'answerfeedback') {
             $currentanswer = $qa->get_last_qt_var('answer');
             $answer = $qa->get_question()->get_matching_answer(array('answer' => $currentanswer));

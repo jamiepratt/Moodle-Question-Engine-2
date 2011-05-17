@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -150,7 +149,7 @@ class quiz_grading_report extends quiz_default_report {
 
         if ($this->currentgroup) {
             list($usql, $uparam) = $DB->get_in_or_equal(array_keys($this->users),
-                    SQL_PARAMS_NAMED, 'mangru00000');
+                    SQL_PARAMS_NAMED, 'mangru');
             $where .= ' AND quiza.userid ' . $usql;
             $params += $uparam;
         }

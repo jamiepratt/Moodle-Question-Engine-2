@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -282,7 +281,7 @@ ORDER BY
      * @return array of records. See the SQL in this function to see the fields available.
      */
     public function load_questions_usages_latest_steps(qubaid_condition $qubaids, $slots) {
-        list($slottest, $params) = $this->db->get_in_or_equal($slots, SQL_PARAMS_NAMED, 'slot0000');
+        list($slottest, $params) = $this->db->get_in_or_equal($slots, SQL_PARAMS_NAMED, 'slot');
 
         $records = $this->db->get_records_sql("
 SELECT
@@ -330,8 +329,9 @@ WHERE
      * fields $slot, $questionid, $inprogress, $name, $needsgrading, $autograded,
      * $manuallygraded and $all.
      */
-    public function load_questions_usages_question_state_summary(qubaid_condition $qubaids, $slots) {
-        list($slottest, $params) = $this->db->get_in_or_equal($slots, SQL_PARAMS_NAMED, 'slot0000');
+    public function load_questions_usages_question_state_summary(
+            qubaid_condition $qubaids, $slots) {
+        list($slottest, $params) = $this->db->get_in_or_equal($slots, SQL_PARAMS_NAMED, 'slot');
 
         $rs = $this->db->get_recordset_sql("
 SELECT
@@ -486,7 +486,8 @@ $sqlorderby
      */
     public function load_average_marks(qubaid_condition $qubaids, $slots = null) {
         if (!empty($slots)) {
-            list($slottest, $slotsparams) = $this->db->get_in_or_equal($slots, SQL_PARAMS_NAMED, 'slot0000');
+            list($slottest, $slotsparams) = $this->db->get_in_or_equal(
+                    $slots, SQL_PARAMS_NAMED, 'slot');
             $slotwhere = " AND qa.slot $slottest";
         } else {
             $slotwhere = '';
@@ -501,7 +502,7 @@ $sqlorderby
                 question_state::$mangaveup,
                 question_state::$mangrwrong,
                 question_state::$mangrpartial,
-                question_state::$mangrright), SQL_PARAMS_NAMED, 'st00');
+                question_state::$mangrright), SQL_PARAMS_NAMED, 'st');
 
         return $this->db->get_records_sql("
 SELECT
@@ -642,7 +643,7 @@ ORDER BY
         $contextids = $this->db->get_records_sql_menu("
                 SELECT DISTINCT contextid, 1
                 FROM {question_usages}
-                WHERE id {$qubaids->usage_id_in()}", $params);
+                WHERE id {$qubaids->usage_id_in()}", $qubaids->usage_id_in_params());
         foreach ($contextids as $contextid => $notused) {
             $this->delete_response_files($contextid, "IN (
                     SELECT qas.id
@@ -663,10 +664,11 @@ ORDER BY
                 WHERE $where)", $params);
 
         $this->db->delete_records_select('question_attempts',
-                "{question_attempts}.questionusageid {$qubaids->usage_id_in()}", $params);
+                "{question_attempts}.questionusageid {$qubaids->usage_id_in()}",
+                $qubaids->usage_id_in_params());
 
         $this->db->delete_records_select('question_usages',
-                "{question_usages}.id {$qubaids->usage_id_in()}", $params);
+                "{question_usages}.id {$qubaids->usage_id_in()}", $qubaids->usage_id_in_params());
     }
 
     /**
@@ -688,7 +690,8 @@ ORDER BY
                 SELECT qas.id
                 FROM {question_attempt_steps} qas
                 WHERE questionattemptid $test)", $params);
-        $this->db->delete_records_select('question_attempt_steps', 'questionattemptid ' . $test, $params);
+        $this->db->delete_records_select('question_attempt_steps',
+                'questionattemptid ' . $test, $params);
     }
 
     /**
@@ -701,7 +704,7 @@ ORDER BY
      */
     protected function delete_response_files($contextid, $itemidstest, $params) {
         $fs = get_file_storage();
-        foreach ($this->get_all_response_file_areas() as $filearea) {
+        foreach (question_engine::get_all_response_file_areas() as $filearea) {
             $fs->delete_area_files_select($contextid, 'question', $filearea,
                     $itemidstest, $params);
         }
@@ -764,7 +767,7 @@ ORDER BY
      */
     public function in_summary_state_test($summarystate, $equal = true, $prefix = 'summarystates') {
         $states = question_state::get_all_for_summary_state($summarystate);
-        return $this->db->get_in_or_equal($states, SQL_PARAMS_NAMED, $prefix . '00', $equal);
+        return $this->db->get_in_or_equal($states, SQL_PARAMS_NAMED, $prefix, $equal);
     }
 
     /**
@@ -796,16 +799,16 @@ ORDER BY
     public function sum_usage_marks_subquery($qubaid) {
         return "SELECT SUM(qa.maxmark * qas.fraction)
             FROM {question_attempts} qa
-            JOIN (
-                SELECT summarks_qa.id AS questionattemptid, MAX(summarks_qas.id) AS latestid
-                FROM {question_attempt_steps} summarks_qas
-                JOIN {question_attempts} summarks_qa ON summarks_qa.id = summarks_qas.questionattemptid
-                WHERE summarks_qa.questionusageid = $qubaid
-                GROUP BY summarks_qa.id
-            ) lateststepid ON lateststepid.questionattemptid = qa.id
-            JOIN {question_attempt_steps} qas ON qas.id = lateststepid.latestid
+            JOIN {question_attempt_steps} qas ON qas.id = (
+                SELECT MAX(summarks_qas.id)
+                  FROM {question_attempt_steps} summarks_qas
+                 WHERE summarks_qas.questionattemptid = qa.id
+            )
             WHERE qa.questionusageid = $qubaid
-            HAVING COUNT(CASE WHEN qas.state = 'needsgrading' AND qa.maxmark > 0 THEN 1 ELSE NULL END) = 0";
+            HAVING COUNT(CASE
+                WHEN qas.state = 'needsgrading' AND qa.maxmark > 0 THEN 1
+                ELSE NULL
+            END) = 0";
     }
 
     public function question_attempt_latest_state_view($alias) {
@@ -855,22 +858,6 @@ ORDER BY
         return $this->db->record_exists_select('question_attempts',
                 'questionid ' . $test . ' AND questionusageid ' .
                 $qubaids->usage_id_in(), $params + $qubaids->usage_id_in_params());
-    }
-
-    /**
-     * @return array all the file area names that may contain response files.
-     */
-    public static function get_all_response_file_areas() {
-        $variables = array();
-        foreach (question_bank::get_all_qtypes() as $qtype) {
-            $variables += $qtype->response_file_areas();
-        }
-
-        $areas = array();
-        foreach (array_unique($variables) as $variable) {
-            $areas[] = 'response_' . $variable;
-        }
-        return $areas;
     }
 }
 
@@ -1166,7 +1153,8 @@ class qubaid_list extends qubaid_condition {
             $this->params = array();
             return '1 = 0';
         }
-        list($where, $this->params) = $DB->get_in_or_equal($this->qubaids, SQL_PARAMS_NAMED, 'qubaid0000');
+        list($where, $this->params) = $DB->get_in_or_equal(
+                $this->qubaids, SQL_PARAMS_NAMED, 'qubaid');
 
         return $this->columntotest . ' ' . $this->usage_id_in();
     }
@@ -1181,7 +1169,8 @@ class qubaid_list extends qubaid_condition {
         if (empty($this->qubaids)) {
             return '= 0';
         }
-        list($where, $this->params) = $DB->get_in_or_equal($this->qubaids, SQL_PARAMS_NAMED, 'qubaid0000');
+        list($where, $this->params) = $DB->get_in_or_equal(
+                $this->qubaids, SQL_PARAMS_NAMED, 'qubaid');
         return $where;
     }
 

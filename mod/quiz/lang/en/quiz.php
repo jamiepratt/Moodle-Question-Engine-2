@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -97,6 +96,7 @@ $string['attemptsnum'] = 'Attempts: {$a}';
 $string['attemptsnumthisgroup'] = 'Attempts: {$a->total} ({$a->group} from this group)';
 $string['attemptsnumyourgroups'] = 'Attempts: {$a->total} ({$a->group} from your groups)';
 $string['attemptsonly'] = 'Show only students with attempts';
+$string['attemptstillinprogress'] = 'Attempt still in progress';
 $string['attemptsunlimited'] = 'Unlimited attempts';
 $string['back'] = 'Back to preview question';
 $string['backtocourse'] = 'Back to the course';
@@ -348,6 +348,7 @@ $string['guestsno'] = 'Sorry, guests cannot see or attempt quizzes';
 $string['hidebreaks'] = 'Hide page breaks';
 $string['hidereordertool'] = 'Hide the reordering tool';
 $string['history'] = 'History of responses:';
+$string['howquestionsbehave_desc'] = 'Default setting for how questions behave in a quiz.';
 $string['imagedisplay'] = 'Image to display';
 $string['import'] = 'Import';
 $string['import_help'] = 'This function allows you to import questions from external text files.
@@ -358,14 +359,12 @@ Import and Export formats are a pluggable resource. Other optional formats may b
 $string['import_link'] = 'question/import';
 $string['importcategory'] = 'import category';
 $string['importerror'] = 'An error occurred during import processing';
-$string['importerrorquestion'] = 'Error importing question';
 $string['importfilearea'] = 'Import from file already in course files...';
 $string['importfileupload'] = 'Import from file upload...';
 $string['importfromthisfile'] = 'Import from this file';
 $string['importingquestions'] = 'Importing {$a} questions from file';
 $string['importmaxerror'] = 'There is an error in the question. There are too many answers.';
 $string['importmax10error'] = 'There is an error in the question. You may not have more than ten answers';
-$string['importparseerror'] = 'Error(s) found parsing the import file. No questions have been imported. To import any good questions try again setting \'Stop on error\' to \'No\'';
 $string['importquestions'] = 'Import questions from file';
 $string['inactiveoverridehelp'] = '* Student does not have the correct group or role to attempt the quiz';
 $string['incorrect'] = 'Incorrect';
@@ -771,6 +770,8 @@ $string['updatingatttemptgrades'] = 'Updating attempt grades.';
 $string['updatingfinalgrades'] = 'Updating final grades.';
 $string['updatingthegradebook'] = 'Updating the gradebook.';
 $string['upgradesure'] = '<div>In particular the quiz module will perform an extensive change of the quiz tables and this upgrade has not yet been sufficiently tested. You are very strongly urged to backup your database tables before proceeding.</div>';
+$string['upgradingquizattempts'] = 'Upgrading quiz attempts: quiz {$a->done}/{$a->outof} (Quiz id {$a->info})';
+$string['upgradingveryoldquizattempts'] = 'Upgrading very old quiz attempts: {$a->done}/{$a->outof}';
 $string['url'] = 'URL';
 $string['usedcategorymoved'] = 'This category has been preserved and moved to the site level because it is a published category still in use by other courses.';
 $string['useroverrides'] = 'User overrides';

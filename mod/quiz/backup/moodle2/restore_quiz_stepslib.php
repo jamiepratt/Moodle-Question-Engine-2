@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -50,8 +49,7 @@ class restore_quiz_activity_structure_step extends restore_questions_activity_st
                     '/activity/quiz/attempts/attempt');
             $paths[] = $quizattempt;
             // Add states and sessions
-            $this->add_question_attempts_states($quizattempt, $paths);
-            $this->add_question_attempts_sessions($quizattempt, $paths);
+            $this->add_question_usages($quizattempt, $paths);
         }
 
         // Return the paths wrapped into standard activity structure
@@ -266,7 +264,7 @@ class restore_quiz_activity_structure_step extends restore_questions_activity_st
         $data->quiz = $this->get_new_parentid('quiz');
         $data->attempt = $data->attemptnum;
 
-        $data->uniqueid = question_new_attempt_uniqueid('quiz');
+        $data->uniqueid = 0; // filled in later by {@link inform_new_usage_id()}
 
         $data->userid = $this->get_mappingid('user', $data->userid);
 
@@ -274,18 +272,20 @@ class restore_quiz_activity_structure_step extends restore_questions_activity_st
         $data->timefinish = $this->apply_date_offset($data->timefinish);
         $data->timemodified = $this->apply_date_offset($data->timemodified);
 
-        $data->layout = $this->questions_recode_layout($data->layout);
-
         $newitemid = $DB->insert_record('quiz_attempts', $data);
 
-        // Save quiz_attempt->uniqueid as quiz_attempt mapping, both question_states and
-        // question_sessions have Fk to it and not to quiz_attempts->id at all.
-        $this->set_mapping('quiz_attempt', $olduniqueid, $data->uniqueid, false);
-        // Also save quiz_attempt->id mapping, because logs use it
-        $this->set_mapping('quiz_attempt_id', $oldid, $newitemid, false);
+        // Save quiz_attempt->id mapping, because logs use it
+        $this->set_mapping('quiz_attempt', $oldid, $newitemid, false);
+    }
+
+    protected function inform_new_usage_id($newusageid) {
+        global $DB;
+        $DB->set_field('quiz_attempts', 'uniqueid', $newusageid, array('id' =>
+                $this->get_new_parentid('quiz_attempt')));
     }
 
     protected function after_execute() {
+        parent::after_execute();
         // Add quiz related files, no need to match by itemname (just internally handled context)
         $this->add_related_files('mod_quiz', 'intro', null);
         // Add feedback related files, matching by itemname = 'quiz_feedback'

@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -76,9 +75,10 @@ if ($attemptobj->is_finished()) {
 // Check the access rules.
 $accessmanager = $attemptobj->get_access_manager(time());
 $messages = $accessmanager->prevent_access();
+$output = $PAGE->get_renderer('mod_quiz');
 if (!$attemptobj->is_preview_user() && $messages) {
     print_error('attempterror', 'quiz', $attemptobj->view_url(),
-            $accessmanager->print_messages($messages, true));
+            $output->access_messages($messages));
 }
 $accessmanager->do_password_check($attemptobj->is_preview_user());
 
@@ -99,11 +99,10 @@ $headtags = $attemptobj->get_html_head_contributions($page);
 $PAGE->requires->js_init_call('M.mod_quiz.init_attempt_form', null, false, quiz_get_js_module());
 
 // Arrange for the navigation to be displayed.
-$navbc = $attemptobj->get_navigation_panel('quiz_attempt_nav_panel', $page);
+$navbc = $attemptobj->get_navigation_panel($output, 'quiz_attempt_nav_panel', $page);
 $firstregion = reset($PAGE->blocks->get_regions());
 $PAGE->blocks->add_fake_block($navbc, $firstregion);
 
-// Print the page header
 $title = get_string('attempt', 'quiz', $attemptobj->get_attempt_number());
 $headtags = $attemptobj->get_html_head_contributions($page);
 $PAGE->set_heading($attemptobj->get_course()->fullname);
@@ -122,52 +121,13 @@ if ($accessmanager->securewindow_required($attemptobj->is_preview_user())) {
     echo $OUTPUT->header();
 }
 
-if ($attemptobj->is_preview_user() && $messages) {
-    // Inform teachers of any restrictions that would apply to students at this point.
-    echo $OUTPUT->box_start('quizaccessnotices');
-    echo $OUTPUT->heading(get_string('accessnoticesheader', 'quiz'), 3);
-    $accessmanager->print_messages($messages);
-    echo $OUTPUT->box_end();
-}
-
-// Start the form
-echo '<form id="responseform" method="post" action="', s($attemptobj->processattempt_url()),
-        '" enctype="multipart/form-data" accept-charset="utf-8">', "\n";
-echo '<div>';
-
-// Print all the questions
-foreach ($slots as $slot) {
-    echo $attemptobj->render_question($slot, false, $attemptobj->attempt_url($id, $page));
-}
-
-// Print a link to the next page.
-echo '<div class="submitbtns">';
 if ($attemptobj->is_last_page($page)) {
     $nextpage = -1;
 } else {
     $nextpage = $page + 1;
 }
-echo '<input type="submit" name="next" value="' . get_string('next') . '" />';
-echo "</div>";
 
-// Some hidden fields to trach what is going on.
-echo '<input type="hidden" name="attempt" value="' . $attemptobj->get_attemptid() . '" />';
-echo '<input type="hidden" name="thispage" id="followingpage" value="' . $page . '" />';
-echo '<input type="hidden" name="nextpage" value="' . $nextpage . '" />';
-echo '<input type="hidden" name="timeup" id="timeup" value="0" />';
-echo '<input type="hidden" name="sesskey" value="' . sesskey() . '" />';
-echo '<input type="hidden" name="scrollpos" id="scrollpos" value="" />';
+echo $output->attempt_page($attemptobj, $page, $accessmanager, $messages, $slots, $id, $nextpage);
 
-// Add a hidden field with questionids. Do this at the end of the form, so
-// if you navigate before the form has finished loading, it does not wipe all
-// the student's answers.
-echo '<input type="hidden" name="slots" value="' .
-        implode(',', $slots) . "\" />\n";
-
-// Finish the form
-echo '</div>';
-echo "</form>\n";
-
-// Finish the page
 $accessmanager->show_attempt_timer_if_needed($attemptobj->get_attempt(), time());
 echo $OUTPUT->footer();

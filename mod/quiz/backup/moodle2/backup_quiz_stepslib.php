@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -83,8 +82,7 @@ class backup_quiz_activity_structure_step extends backup_questions_activity_stru
 
         // This module is using questions, so produce the related question states and sessions
         // attaching them to the $attempt element based in 'uniqueid' matching
-        $this->add_question_attempts_states($attempt, 'uniqueid');
-        $this->add_question_attempts_sessions($attempt, 'uniqueid');
+        $this->add_question_usages($attempt, 'uniqueid');
 
         // Build the tree
 
@@ -123,7 +121,11 @@ class backup_quiz_activity_structure_step extends backup_questions_activity_stru
         // All the rest of elements only happen if we are including user info
         if ($userinfo) {
             $grade->set_source_table('quiz_grades', array('quiz' => backup::VAR_PARENTID));
-            $attempt->set_source_table('quiz_attempts', array('quiz' => backup::VAR_PARENTID));
+            $attempt->set_source_sql('
+                    SELECT *
+                    FROM {quiz_attempts}
+                    WHERE quiz = :quiz AND preview = 0',
+                    array('quiz' => backup::VAR_PARENTID));
         }
 
         // Define source alias

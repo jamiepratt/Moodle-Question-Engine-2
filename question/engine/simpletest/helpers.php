@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -37,7 +36,7 @@ require_once(dirname(__FILE__) . '/../lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class testable_question_attempt extends question_attempt {
-    public function add_step($step) {#
+    public function add_step($step) {
         parent::add_step($step);
     }
     public function set_min_fraction($fraction) {
@@ -50,6 +49,22 @@ class testable_question_attempt extends question_attempt {
 
 
 /**
+ * Base class for question type test helpers.
+ *
+ * @copyright  2011 The Open University
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+abstract class question_test_helper {
+    /**
+     * @return array of example question names that can be passed as the $which
+     * argument of {@link test_question_maker::make_question} when $qtype is
+     * this question type.
+     */
+    abstract public function get_test_questions();
+}
+
+
+/**
  * This class creates questions of various types, which can then be used when
  * testing.
  *
@@ -58,8 +73,12 @@ class testable_question_attempt extends question_attempt {
  */
 class test_question_maker {
     const STANDARD_OVERALL_CORRECT_FEEDBACK = 'Well done!';
-    const STANDARD_OVERALL_PARTIALLYCORRECT_FEEDBACK = 'Parts, but only parts, of your response are correct.';
+    const STANDARD_OVERALL_PARTIALLYCORRECT_FEEDBACK =
+            'Parts, but only parts, of your response are correct.';
     const STANDARD_OVERALL_INCORRECT_FEEDBACK = 'That is not right at all.';
+
+    /** @var array qtype => qtype test helper class. */
+    protected static $testhelpers = array();
 
     /**
      * Just make a question_attempt at a question. Useful for unit tests that
@@ -94,6 +113,53 @@ class test_question_maker {
         $q->timemodified = time();
         $q->createdby = $USER->id;
         $q->modifiedby = $USER->id;
+    }
+
+    /**
+     * Get the test helper class for a particular question type.
+     * @param $qtype the question type name, e.g. 'multichoice'.
+     * @return question_test_helper the test helper class.
+     */
+    public static function get_test_helper($qtype) {
+        if (array_key_exists($qtype, self::$testhelpers)) {
+            return self::$testhelpers[$qtype];
+        }
+
+        $file = get_plugin_directory('qtype', $qtype) . '/simpletest/helper.php';
+        if (!is_readable($file)) {
+            throw new coding_exception('Question type ' . $qtype .
+                    ' does not have test helper code.');
+        }
+        include_once($file);
+
+        $class = 'qtype_' . $qtype . '_test_helper';
+        if (!class_exists($class)) {
+            throw new coding_exception('Class ' . $class . ' is not defined in ' . $file);
+        }
+
+        self::$testhelpers[$qtype] = new $class();
+        return self::$testhelpers[$qtype];
+    }
+
+    public static function make_question($qtype, $which = null) {
+        $helper = self::get_test_helper($qtype);
+
+        $available = $helper->get_test_questions();
+
+        if (is_null($which)) {
+            $which = reset($available);
+        } else if (!in_array($which, $available)) {
+            throw new coding_exception('Example question ' . $which . ' of type ' .
+                    $qtype . ' does not exist.');
+        }
+
+        $method = "make_{$qtype}_question_{$which}";
+        if (!method_exists($helper, $method)) {
+            throw new coding_exception('Method ' . $method . ' does not exist on the' .
+                    $qtype . ' question type test helper class.');
+        }
+
+        return $helper->$method();
     }
 
     /**
@@ -232,31 +298,6 @@ class test_question_maker {
     }
 
     /**
-     * Makes a numerical question with correct ansewer 3.14, and various incorrect
-     * answers with different feedback.
-     * @return qtype_numerical_question
-     */
-    public static function make_a_numerical_question() {
-        question_bank::load_question_definition_classes('numerical');
-        $num = new qtype_numerical_question();
-        self::initialise_a_question($num);
-        $num->name = 'Pi to two d.p.';
-        $num->questiontext = 'What is pi to two d.p.?';
-        $num->generalfeedback = 'Generalfeedback: 3.14 is the right answer.';
-        $num->answers = array(
-            13 => new qtype_numerical_answer(13, '3.14', 1.0, 'Very good.', FORMAT_HTML, 0),
-            14 => new qtype_numerical_answer(14, '3.142', 0.0, 'Too accurate.', FORMAT_HTML, 0.005),
-            15 => new qtype_numerical_answer(15, '3.1', 0.0, 'Not accurate enough.', FORMAT_HTML, 0.05),
-            16 => new qtype_numerical_answer(16, '3', 0.0, 'Not accurate enough.', FORMAT_HTML, 0.5),
-            17 => new qtype_numerical_answer(17, '*', 0.0, 'Completely wrong.', FORMAT_HTML, 0),
-        );
-        $num->qtype = question_bank::get_qtype('numerical');
-        $num->ap = new qtype_numerical_answer_processor(array());
-
-        return $num;
-    }
-
-    /**
      * Makes a truefalse question with correct ansewer true, defaultmark 1.
      * @return qtype_essay_question
      */
@@ -288,8 +329,10 @@ class test_question_maker {
         $description = new qtype_description_question();
         self::initialise_a_question($description);
         $description->name = 'Description question';
-        $description->questiontext = 'This text tells you a bit about the next few questions in this quiz.';
-        $description->generalfeedback = 'This is what this section of the quiz should have taught you.';
+        $description->questiontext =
+                'This text tells you a bit about the next few questions in this quiz.';
+        $description->generalfeedback =
+                'This is what this section of the quiz should have taught you.';
         $description->qtype = question_bank::get_qtype('description');
 
         return $description;
@@ -378,7 +421,8 @@ class qbehaviour_walkthrough_test_base extends UnitTestCase {
         $this->quba = null;
     }
 
-    protected function start_attempt_at_question($question, $preferredbehaviour, $maxmark = null) {
+    protected function start_attempt_at_question($question, $preferredbehaviour,
+            $maxmark = null) {
         $this->quba->set_preferred_behaviour($preferredbehaviour);
         $this->slot = $this->quba->add_question($question, $maxmark);
         $this->quba->start_all_questions();
@@ -392,7 +436,8 @@ class qbehaviour_walkthrough_test_base extends UnitTestCase {
     }
 
     protected function check_current_state($state) {
-        $this->assertEqual($this->quba->get_question_state($this->slot), $state, 'Questions is in the wrong state: %s.');
+        $this->assertEqual($this->quba->get_question_state($this->slot), $state,
+                'Questions is in the wrong state: %s.');
     }
 
     protected function check_current_mark($mark) {
@@ -452,7 +497,8 @@ class qbehaviour_walkthrough_test_base extends UnitTestCase {
     }
 
     protected function get_contains_partcorrect_expectation() {
-        return new PatternExpectation('/' . preg_quote(get_string('partiallycorrect', 'question')) . '/');
+        return new PatternExpectation('/' .
+                preg_quote(get_string('partiallycorrect', 'question')) . '/');
     }
 
     protected function get_contains_incorrect_expectation() {
@@ -460,15 +506,18 @@ class qbehaviour_walkthrough_test_base extends UnitTestCase {
     }
 
     protected function get_contains_standard_correct_combined_feedback_expectation() {
-        return new PatternExpectation('/' . preg_quote(test_question_maker::STANDARD_OVERALL_CORRECT_FEEDBACK) . '/');
+        return new PatternExpectation('/' .
+                preg_quote(test_question_maker::STANDARD_OVERALL_CORRECT_FEEDBACK) . '/');
     }
 
     protected function get_contains_standard_partiallycorrect_combined_feedback_expectation() {
-        return new PatternExpectation('/' . preg_quote(test_question_maker::STANDARD_OVERALL_PARTIALLYCORRECT_FEEDBACK) . '/');
+        return new PatternExpectation('/' .
+                preg_quote(test_question_maker::STANDARD_OVERALL_PARTIALLYCORRECT_FEEDBACK) . '/');
     }
 
     protected function get_contains_standard_incorrect_combined_feedback_expectation() {
-        return new PatternExpectation('/' . preg_quote(test_question_maker::STANDARD_OVERALL_INCORRECT_FEEDBACK) . '/');
+        return new PatternExpectation('/' .
+                preg_quote(test_question_maker::STANDARD_OVERALL_INCORRECT_FEEDBACK) . '/');
     }
 
     protected function get_does_not_contain_feedback_expectation() {
@@ -535,7 +584,8 @@ class qbehaviour_walkthrough_test_base extends UnitTestCase {
         return new ContainsTagWithAttributes('input', $expectedattributes, $forbiddenattributes);
     }
 
-    protected function get_contains_mc_checkbox_expectation($index, $enabled = null, $checked = null) {
+    protected function get_contains_mc_checkbox_expectation($index, $enabled = null,
+            $checked = null) {
         return $this->get_contains_checkbox_expectation(array(
                 'name' => $this->quba->get_field_prefix($this->slot) . $index,
                 'value' => 1,
@@ -596,7 +646,8 @@ class qbehaviour_walkthrough_test_base extends UnitTestCase {
                 ), $enabled, $checked);
     }
 
-    protected function get_contains_cbm_radio_expectation($certainty, $enabled = null, $checked = null) {
+    protected function get_contains_cbm_radio_expectation($certainty, $enabled = null,
+            $checked = null) {
         return $this->get_contains_radio_expectation(array(
                 'name' => $this->quba->get_field_prefix($this->slot) . '-certainty',
                 'value' => $certainty,
@@ -626,11 +677,13 @@ class qbehaviour_walkthrough_test_base extends UnitTestCase {
     }
 
     protected function get_tries_remaining_expectation($n) {
-        return new PatternExpectation('/' . preg_quote(get_string('triesremaining', 'qbehaviour_interactive', $n)) . '/');
+        return new PatternExpectation('/' .
+                preg_quote(get_string('triesremaining', 'qbehaviour_interactive', $n)) . '/');
     }
 
     protected function get_invalid_answer_expectation() {
-        return new PatternExpectation('/' . preg_quote(get_string('invalidanswer', 'question')) . '/');
+        return new PatternExpectation('/' .
+                preg_quote(get_string('invalidanswer', 'question')) . '/');
     }
 
     protected function get_contains_try_again_button_expectation($enabled = null) {

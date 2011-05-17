@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -1106,7 +1105,7 @@ class question_bank_view {
         } else {
             $categoryids = array($category->id);
         }
-        list($catidtest, $params) = $DB->get_in_or_equal($categoryids, SQL_PARAMS_NAMED, 'cat0000');
+        list($catidtest, $params) = $DB->get_in_or_equal($categoryids, SQL_PARAMS_NAMED, 'cat');
         $tests[] = 'q.category ' . $catidtest;
         $this->sqlparams = $params;
 
@@ -1697,7 +1696,7 @@ function question_edit_setup($edittab, $baseurl, $requirecmid = false, $requirec
  * Required for legacy reasons. Was originally global then changed to class static
  * as of Moodle 2.0
  */
-$QUESTION_EDITTABCAPS = question_edit_contexts::$CAPS;
+$QUESTION_EDITTABCAPS = question_edit_contexts::$caps;
 
 /**
  * Make sure user is logged in as required in this context.

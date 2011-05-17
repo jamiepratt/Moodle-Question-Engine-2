@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -37,15 +36,15 @@ function xmldb_quiz_install() {
     $record = new stdClass();
     $record->name         = 'overview';
     $record->displayorder = '10000';
-    $DB->insert_record('quiz_report', $record);
+    $DB->insert_record('quiz_reports', $record);
 
     $record = new stdClass();
     $record->name         = 'responses';
     $record->displayorder = '9000';
-    $DB->insert_record('quiz_report', $record);
+    $DB->insert_record('quiz_reports', $record);
 
     $record = new stdClass();
     $record->name         = 'grading';
     $record->displayorder = '6000';
-    $DB->insert_record('quiz_report', $record);
+    $DB->insert_record('quiz_reports', $record);
 }

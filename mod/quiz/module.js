@@ -175,7 +175,7 @@ M.mod_quiz.nav.init = function(Y) {
 
 M.mod_quiz.secure_window = {
     init: function(Y) {
-        if (window.location.href.substring(0,4) == 'file') {
+        if (window.location.href.substring(0, 4) == 'file') {
             window.location = 'about:blank';
         }
         Y.delegate('contextmenu', M.mod_quiz.secure_window.prevent, document.body, '*');
@@ -214,6 +214,12 @@ M.mod_quiz.secure_window = {
             return;
         }
         e.halt();
+    },
+
+    init_close_button: function(Y, url) {
+        Y.on('click', function(e) {
+            M.mod_quiz.secure_window.close(url, 0)
+        }, '#secureclosebutton');
     },
 
     close: function(url, delay) {

@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -484,14 +483,21 @@ abstract class question_edit_form extends moodleform {
     }
 
     /**
-     * Any preprocessing needed for the settings form for the question type
-     *
-     * @param array $question - array to fill in with the default values
+     * Perform an preprocessing needed on the data passed to {@link set_data()}
+     * before it is used to initialise the form.
+     * @param object $question the data being passed to the form.
+     * @return object $question the modified data.
      */
     protected function data_preprocessing($question) {
         return $question;
     }
 
+    /**
+     * Perform the necessary preprocessing for the fields added by
+     * {@link add_per_answer_fields()}.
+     * @param object $question the data being passed to the form.
+     * @return object $question the modified data.
+     */
     protected function data_preprocessing_answers($question) {
         if (empty($question->options->answers)) {
             return $question;
@@ -532,6 +538,12 @@ abstract class question_edit_form extends moodleform {
         return $question;
     }
 
+    /**
+     * Perform the necessary preprocessing for the fields added by
+     * {@link add_combined_feedback_fields()}.
+     * @param object $question the data being passed to the form.
+     * @return object $question the modified data.
+     */
     protected function data_preprocessing_combined_feedback($question,
             $withshownumcorrect = false) {
         if (empty($question->options)) {
@@ -565,6 +577,11 @@ abstract class question_edit_form extends moodleform {
         return $question;
     }
 
+    /**
+     * Perform the necessary preprocessing for the hint fields.
+     * @param object $question the data being passed to the form.
+     * @return object $question the modified data.
+     */
     protected function data_preprocessing_hints($question, $withclearwrong = false,
             $withshownumpartscorrect = false) {
         if (empty($question->hints)) {

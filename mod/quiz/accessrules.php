@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -78,10 +77,12 @@ class quiz_access_manager {
         }
         if (!empty($quiz->popup)) {
             if ($quiz->popup == 1) {
-                $this->_securewindowrule = new securewindow_access_rule($this->_quizobj, $this->_timenow);
+                $this->_securewindowrule = new securewindow_access_rule(
+                        $this->_quizobj, $this->_timenow);
                 $this->_rules[] = $this->_securewindowrule;
-            } elseif ($quiz->popup == 2) {
-                $this->_safebrowserrule = new safebrowser_access_rule($this->_quizobj, $this->_timenow);
+            } else if ($quiz->popup == 2) {
+                $this->_safebrowserrule = new safebrowser_access_rule(
+                        $this->_quizobj, $this->_timenow);
                 $this->_rules[] = $this->_safebrowserrule;
             }
         }
@@ -92,27 +93,6 @@ class quiz_access_manager {
             $messages = array_merge($messages, $new);
         } else if (is_string($new) && $new) {
             $messages[] = $new;
-        }
-    }
-
-    /**
-     * Print each message in an array, surrounded by &lt;p>, &lt;/p> tags.
-     *
-     * @param array $messages the array of message strings.
-     * @param bool $return if true, return a string, instead of outputting.
-     *
-     * @return mixed, if $return is true, return the string that would have been output, otherwise
-     * return null.
-     */
-    public function print_messages($messages, $return=false) {
-        $output = '';
-        foreach ($messages as $message) {
-            $output .= '<p>' . $message . "</p>\n";
-        }
-        if ($return) {
-            return $output;
-        } else {
-            echo $output;
         }
     }
 
@@ -175,7 +155,8 @@ class quiz_access_manager {
      *
      * @param int $numattempts the number of previous attempts this user has made.
      * @param object $lastattempt information about the user's last completed attempt.
-     * @return bool true if there is no way the user will ever be allowed to attempt this quiz again.
+     * @return bool true if there is no way the user will ever be allowed to attempt
+     *      this quiz again.
      */
     public function is_finished($numprevattempts, $lastattempt) {
         foreach ($this->_rules as $rule) {
@@ -206,8 +187,8 @@ class quiz_access_manager {
             }
         }
         if ($timeleft !== false) {
-        /// Make sure the timer starts just above zero. If $timeleft was <= 0, then
-        /// this will just have the effect of causing the quiz to be submitted immediately.
+            // Make sure the timer starts just above zero. If $timeleft was <= 0, then
+            // this will just have the effect of causing the quiz to be submitted immediately.
             $timerstartvalue = max($timeleft, 1);
             $PAGE->requires->js_init_call('M.mod_quiz.timer.init',
                     array($timerstartvalue), false, quiz_get_js_module());
@@ -223,7 +204,7 @@ class quiz_access_manager {
 
     /**
      * @return bolean if this quiz should only be shown to students with safe browser.
-    */
+     */
     public function safebrowser_required($canpreview) {
         return !$canpreview && !is_null($this->_safebrowserrule);
     }
@@ -239,6 +220,7 @@ class quiz_access_manager {
      * @param bool $unfinished whether the button is to continue an existing attempt,
      * or start a new one. This affects whether a javascript alert is shown.
      */
+    //TODO: Add this function to renderer
     public function print_start_attempt_button($canpreview, $buttontext, $unfinished) {
         global $OUTPUT;
 
@@ -265,7 +247,7 @@ class quiz_access_manager {
                     $OUTPUT->heading(get_string('noscript', 'quiz')));
         }
 
-        echo $OUTPUT->render($button) . $warning;
+        return $OUTPUT->render($button) . $warning;
     }
 
     /**
@@ -288,7 +270,8 @@ class quiz_access_manager {
                 echo '<p>' . get_string('pleaseclose', 'quiz') . '</p>';
                 $delay = 0;
             }
-            $PAGE->requires->js_function_call('M.mod_quiz.secure_window.close', array($url, $delay));
+            $PAGE->requires->js_function_call('M.mod_quiz.secure_window.close',
+                    array($url, $delay));
             echo $OUTPUT->box_end();
             echo $OUTPUT->footer();
             die();
@@ -358,11 +341,11 @@ class quiz_access_manager {
     public function confirm_start_attempt_message() {
         $quiz = $this->_quizobj->get_quiz();
         if ($quiz->timelimit && $quiz->attempts) {
-            return get_string('confirmstartattempttimelimit','quiz', $quiz->attempts);
+            return get_string('confirmstartattempttimelimit', 'quiz', $quiz->attempts);
         } else if ($quiz->timelimit) {
-            return get_string('confirmstarttimelimit','quiz');
+            return get_string('confirmstarttimelimit', 'quiz');
         } else if ($quiz->attempts) {
-            return get_string('confirmstartattemptlimit','quiz', $quiz->attempts);
+            return get_string('confirmstartattemptlimit', 'quiz', $quiz->attempts);
         }
         return '';
     }
@@ -372,18 +355,20 @@ class quiz_access_manager {
      *
      * @param string $linktext some text.
      * @param object $attempt the attempt object
-     * @return string some HTML, the $linktext either unmodified or wrapped in a link to the review page.
+     * @return string some HTML, the $linktext either unmodified or wrapped in a
+     *      link to the review page.
      */
     public function make_review_link($attempt, $canpreview, $reviewoptions) {
         global $CFG;
 
-    /// If review of responses is not allowed, or the attempt is still open, don't link.
+        // If review of responses is not allowed, or the attempt is still open, don't link.
         if (!$attempt->timefinish) {
             return '';
         }
 
         $when = quiz_attempt_state($this->_quizobj->get_quiz(), $attempt);
-        $reviewoptions = mod_quiz_display_options::make_from_quiz($this->_quizobj->get_quiz(), $when);
+        $reviewoptions = mod_quiz_display_options::make_from_quiz(
+                $this->_quizobj->get_quiz(), $when);
 
         if (!$reviewoptions->attempt) {
             $message = $this->cannot_review_message($when, true);
@@ -396,7 +381,7 @@ class quiz_access_manager {
 
         $linktext = get_string('review', 'quiz');
 
-    /// It is OK to link, does it need to be in a secure window?
+        // It is OK to link, does it need to be in a secure window?
         if ($this->securewindow_required($canpreview)) {
             return $this->_securewindowrule->make_review_link($linktext, $attempt->id);
         } else {
@@ -423,11 +408,13 @@ class quiz_access_manager {
             $langstrsuffix = '';
             $dateformat = '';
         }
-        if ($when == mod_quiz_display_options::DURING || $when == mod_quiz_display_options::IMMEDIATELY_AFTER) {
+        if ($when == mod_quiz_display_options::DURING ||
+                $when == mod_quiz_display_options::IMMEDIATELY_AFTER) {
             return '';
-        } else if ($when == mod_quiz_display_options::LATER_WHILE_OPEN &&
-                $quiz->timeclose && $quiz->reviewattempt & mod_quiz_display_options::AFTER_CLOSE) {
-            return get_string('noreviewuntil' . $langstrsuffix, 'quiz', userdate($quiz->timeclose, $dateformat));
+        } else if ($when == mod_quiz_display_options::LATER_WHILE_OPEN && $quiz->timeclose &&
+                $quiz->reviewattempt & mod_quiz_display_options::AFTER_CLOSE) {
+            return get_string('noreviewuntil' . $langstrsuffix, 'quiz',
+                    userdate($quiz->timeclose, $dateformat));
         } else {
             return get_string('noreview' . $langstrsuffix, 'quiz');
         }
@@ -464,14 +451,16 @@ abstract class quiz_access_rule_base {
      * Whether or not a user should be allowed to start a new attempt at this quiz now.
      * @param int $numattempts the number of previous attempts this user has made.
      * @param object $lastattempt information about the user's last completed attempt.
-     * @return string false if access should be allowed, a message explaining the reason if access should be prevented.
+     * @return string false if access should be allowed, a message explaining the
+     *      reason if access should be prevented.
      */
     public function prevent_new_attempt($numprevattempts, $lastattempt) {
         return false;
     }
     /**
      * Whether or not a user should be allowed to start a new attempt at this quiz now.
-     * @return string false if access should be allowed, a message explaining the reason if access should be prevented.
+     * @return string false if access should be allowed, a message explaining the
+     *      reason if access should be prevented.
      */
     public function prevent_access() {
         return false;
@@ -587,7 +576,7 @@ class open_close_date_access_rule extends quiz_access_rule_base {
 }
 
 /**
- * A rule imposing the delay between attemtps settings.
+ * A rule imposing the delay between attempts settings.
  *
  * @copyright  2009 Tim Hunt
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -595,11 +584,11 @@ class open_close_date_access_rule extends quiz_access_rule_base {
 class inter_attempt_delay_access_rule extends quiz_access_rule_base {
     public function prevent_new_attempt($numprevattempts, $lastattempt) {
         if ($this->_quiz->attempts > 0 && $numprevattempts >= $this->_quiz->attempts) {
-        /// No more attempts allowed anyway.
+            // No more attempts allowed anyway.
             return false;
         }
         if ($this->_quiz->timeclose != 0 && $this->_timenow > $this->_quiz->timeclose) {
-        /// No more attempts allowed anyway.
+            // No more attempts allowed anyway.
             return false;
         }
         $nextstarttime = $this->compute_next_start_time($numprevattempts, $lastattempt);
@@ -626,7 +615,7 @@ class inter_attempt_delay_access_rule extends quiz_access_rule_base {
         }
 
         $lastattemptfinish = $lastattempt->timefinish;
-        if ($this->_quiz->timelimit > 0){
+        if ($this->_quiz->timelimit > 0) {
             $lastattemptfinish = min($lastattemptfinish,
                     $lastattempt->timestart + $this->_quiz->timelimit);
         }
@@ -693,17 +682,17 @@ class password_access_rule extends quiz_access_rule_base {
     public function do_password_check($canpreview, $accessmanager) {
         global $CFG, $SESSION, $OUTPUT, $PAGE;
 
-    /// We have already checked the password for this quiz this session, so don't ask again.
+        // We have already checked the password for this quiz this session, so don't ask again.
         if (!empty($SESSION->passwordcheckedquizzes[$this->_quiz->id])) {
             return;
         }
 
-    /// If the user cancelled the password form, send them back to the view page.
+        // If the user cancelled the password form, send them back to the view page.
         if (optional_param('cancelpassword', false, PARAM_BOOL)) {
             $accessmanager->back_to_view_page($canpreview);
         }
 
-    /// If they entered the right password, let them in.
+        // If they entered the right password, let them in.
         $enteredpassword = optional_param('quizpassword', '', PARAM_RAW);
         $validpassword = false;
         if (strcmp($this->_quiz->password, $enteredpassword) === 0) {
@@ -722,15 +711,16 @@ class password_access_rule extends quiz_access_rule_base {
             return;
         }
 
-    /// User entered the wrong password, or has not entered one yet, so display the form.
+        // User entered the wrong password, or has not entered one yet, so display the form.
         $output = '';
 
-    /// Start the page and print the quiz intro, if any.
+        // Start the page and print the quiz intro, if any.
         if ($accessmanager->securewindow_required($canpreview)) {
             $accessmanager->setup_secure_page($this->_quizobj->get_course()->shortname . ': ' .
                     format_string($this->_quizobj->get_quiz_name()));
         } else if ($accessmanager->safebrowser_required($canpreview)) {
-            $PAGE->set_title($this->_quizobj->get_course()->shortname . ': '.format_string($this->_quizobj->get_quiz_name()));
+            $PAGE->set_title($this->_quizobj->get_course()->shortname . ': ' .
+                    format_string($this->_quizobj->get_quiz_name()));
             $PAGE->set_cacheable(false);
             echo $OUTPUT->header();
         } else {
@@ -739,16 +729,17 @@ class password_access_rule extends quiz_access_rule_base {
         }
 
         if (trim(strip_tags($this->_quiz->intro))) {
-            $output .= $OUTPUT->box(format_module_intro('quiz', $this->_quiz, $this->_quizobj->get_cmid()), 'generalbox', 'intro');
+            $output .= $OUTPUT->box(format_module_intro('quiz', $this->_quiz,
+                    $this->_quizobj->get_cmid()), 'generalbox', 'intro');
         }
         $output .= $OUTPUT->box_start('generalbox', 'passwordbox');
 
-    /// If they have previously tried and failed to enter a password, tell them it was wrong.
+        // If they have previously tried and failed to enter a password, tell them it was wrong.
         if (!empty($enteredpassword)) {
             $output .= '<p class="notifyproblem">' . get_string('passworderror', 'quiz') . '</p>';
         }
 
-    /// Print the password entry form.
+        // Print the password entry form.
         $output .= '<p>' . get_string('requirepasswordmessage', 'quiz') . "</p>\n";
         $output .= '<form id="passwordform" method="post" action="' . $CFG->wwwroot .
                 '/mod/quiz/startattempt.php" onclick="this.autocomplete=\'off\'">' . "\n";
@@ -764,10 +755,10 @@ class password_access_rule extends quiz_access_rule_base {
         $output .= "</div>\n";
         $output .= "</form>\n";
 
-    /// Finish page.
+        // Finish page.
         $output .= $OUTPUT->box_end();
 
-    /// return or display form.
+        // return or display form.
         echo $output;
         echo $OUTPUT->footer();
         exit;
