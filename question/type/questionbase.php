@@ -321,6 +321,23 @@ abstract class question_definition {
             return false;
         }
     }
+
+    /**
+     * @return int how many variants this question has.
+     */
+    public function get_no_of_variants() {
+        return 1;
+    }
+
+    /**
+     *
+     * @return string seed used for random number generation. Used to randomise variant order.
+     */
+    protected function get_random_seed(){
+        global $USER;
+        return $this->stamp;
+    }
+
 }
 
 

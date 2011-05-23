@@ -285,6 +285,14 @@ class question_usage_by_activity {
     }
 
     /**
+     * @param int $slot the number used to identify this question within this usage.
+     * @return int how many variants this question has.
+     */
+    public function get_no_of_question_variants($slot) {
+        return $this->get_question_attempt($slot)->get_no_of_question_variants();
+    }
+
+    /**
      * Get the current mark awarded for the attempt at a question.
      * @param int $slot the number used to identify this question within this usage.
      * @return number|null The current mark for this question, or null if one has
@@ -410,19 +418,24 @@ class question_usage_by_activity {
     /**
      * Start the attempt at a question that has been added to this usage.
      * @param int $slot the number used to identify this question within this usage.
+     * @param int $variantno the number of the question variant to start.
+     * @param boolean $randomisevariantorder whether to randomize variant order.
      */
-    public function start_question($slot) {
+    public function start_question($slot, $variantno = 1, $randomisevariantorder = true) {
         $qa = $this->get_question_attempt($slot);
+        $qa->set_variant_no($variantno, $randomisevariantorder);
         $qa->start($this->preferredbehaviour);
         $this->observer->notify_attempt_modified($qa);
     }
 
     /**
      * Start the attempt at all questions that has been added to this usage.
+     * @param int $variantno the number of the question variant to start.
+     * @param boolean $randomisevariantorder whether to randomize variant order.
      */
-    public function start_all_questions() {
+    public function start_all_questions($variantno = 1, $randomisevariantorder = true) {
         foreach ($this->questionattempts as $qa) {
-            $qa->start($this->preferredbehaviour);
+            $qa->start($this->preferredbehaviour, $variantno, $randomisevariantorder);
             $this->observer->notify_attempt_modified($qa);
         }
     }
@@ -435,9 +448,9 @@ class question_usage_by_activity {
      * @param question_attempt $oldqa a previous attempt at this quetsion that
      *      defines the starting point.
      */
-    public function start_question_based_on($slot, question_attempt $oldqa) {
+    public function start_question_based_on($slot, question_attempt $oldqa, $variantno = 1, $randomisevariantorder = true) {
         $qa = $this->get_question_attempt($slot);
-        $qa->start_based_on($oldqa);
+        $qa->start_based_on($oldqa, $variantno, $randomisevariantorder);
         $this->observer->notify_attempt_modified($qa);
     }
 

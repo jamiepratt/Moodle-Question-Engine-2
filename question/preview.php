@@ -74,7 +74,7 @@ if ($previewid) {
             get_context_instance_by_id($category->contextid));
     $quba->set_preferred_behaviour($options->behaviour);
     $slot = $quba->add_question($question, $options->maxmark);
-    $quba->start_all_questions();
+    $quba->start_all_questions($options->qvariant, false);
 
     $transaction = $DB->start_delegated_transaction();
     question_engine::save_questions_usage_by_activity($quba);
@@ -82,11 +82,13 @@ if ($previewid) {
 
     $SESSION->question_previews[$quba->get_id()] = true;
 }
+$noofqvariants = $quba->get_no_of_question_variants($slot);
 $options->behaviour = $quba->get_preferred_behaviour();
 $options->maxmark = $quba->get_question_max_mark($slot);
 
 // Create the settings form, and initialise the fields.
-$optionsform = new preview_options_form($CFG->wwwroot . '/question/preview.php?id=' . $question->id, $quba);
+$optionsform = new preview_options_form($CFG->wwwroot . '/question/preview.php?id=' . $question->id,
+                            array('quba' => $quba, 'noofqvariants' => $noofqvariants));
 $optionsform->set_data($options);
 
 // Process change of settings, if that was requested.

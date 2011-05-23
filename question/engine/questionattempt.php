@@ -747,7 +747,8 @@ class question_attempt {
      * @param int $timestamp optional, the timstamp to record for this action. Defaults to now.
      * @param int $userid optional, the user to attribute this action to. Defaults to the current user.
      */
-    public function start($preferredbehaviour, $submitteddata = array(), $timestamp = null, $userid = null) {
+    public function start($preferredbehaviour, $variantno = 1, $randomisevariantorder = true, $submitteddata = array(),
+                            $timestamp = null, $userid = null) {
         // Initialise the behaviour.
         if (is_string($preferredbehaviour)) {
             $this->behaviour =
@@ -763,6 +764,16 @@ class question_attempt {
         // Initialise the first step.
         $firststep = new question_attempt_step($submitteddata, $timestamp, $userid);
         $firststep->set_state(question_state::$todo);
+        if ($randomisevariantorder){
+            $variantno = $this->randomise_variant_order($variantno);
+        } else {
+            $noofvariants = $this->question->get_no_of_variants();
+            $variantno = $variantno % $noofvariants;
+            if ($variantno == 0) {
+                $variantno = $noofvariants;
+            }
+        }
+        $firststep->set_behaviour_var('_variantno', $variantno);
         if ($submitteddata) {
             $this->question->apply_attempt_state($firststep);
         } else {
@@ -775,6 +786,33 @@ class question_attempt {
         $this->rightanswer = $this->behaviour->get_right_answer_summary();
     }
 
+    protected function randomise_variant_order($variantno){
+        $noofvariants = $this->question->get_no_of_variants();
+        if ($noofvariants == 1){
+            return 1;
+        }
+        $noofchars = ceil(log($noofvariants, '16'));
+        $md5string = md5($this->question->get_random_seed());
+        $stringoffset = 0;
+        $variantsnotattempted = array();
+        for ($i=0; $i < $variantno; $i++){
+            if (count($variantsnotattempted) == 0){
+                $variantsnotattempted = array_combine(range(1, $noofvariants), range(1, $noofvariants));
+            }
+            do {
+                while (($stringoffset + $noofchars) > strlen($md5string)){
+                    $md5string .= md5($md5string);
+                }
+                $randomvariant = hexdec(substr($md5string, $stringoffset, $noofchars)) + 1;
+                $stringoffset += $noofchars;
+            } while (!array_key_exists($randomvariant, $variantsnotattempted));
+            unset($variantsnotattempted[$randomvariant]);
+        }
+        return $randomvariant;
+    }
+
+
+
     /**
      * Start this question attempt, starting from the point that the previous
      * attempt $oldqa had reached.
@@ -785,7 +823,7 @@ class question_attempt {
      * @param question_attempt $oldqa a previous attempt at this quetsion that
      *      defines the starting point.
      */
-    public function start_based_on(question_attempt $oldqa) {
+    public function start_based_on(question_attempt $oldqa, $variantno = 1, $randomisevariantorder = true) {
         $this->start($oldqa->behaviour, $oldqa->get_resume_data());
     }
 
@@ -1132,6 +1170,10 @@ class question_attempt {
         $qa->observer = $observer;
 
         return $qa;
+    }
+
+    public function get_no_of_question_variants(){
+        return $this->question->get_no_of_variants();
     }
 }
 

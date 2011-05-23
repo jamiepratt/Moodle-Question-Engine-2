@@ -39,6 +39,7 @@ class preview_options_form extends moodleform {
     public function definition() {
         $mform = $this->_form;
 
+
         $hiddenofvisible = array(
             question_display_options::HIDDEN => get_string('notshown', 'question'),
             question_display_options::VISIBLE => get_string('shown', 'question'),
@@ -46,7 +47,15 @@ class preview_options_form extends moodleform {
 
         $mform->addElement('header', 'optionsheader', get_string('changeoptions', 'question'));
 
-        $behaviours = question_engine::get_behaviour_options($this->_customdata->get_preferred_behaviour());
+        if ($this->_customdata['noofqvariants'] > 1){
+            $noofqvariants = array();
+            for ($i = 1; $i <= $this->_customdata['noofqvariants']; $i++){
+                $noofqvariants[$i] = $i;
+            }
+            $mform->addElement('select', 'qvariant', get_string('qvariant', 'question'), $noofqvariants);
+        }
+
+        $behaviours = question_engine::get_behaviour_options($this->_customdata['quba']->get_preferred_behaviour());
         $mform->addElement('select', 'behaviour', get_string('howquestionsbehave', 'question'), $behaviours);
         $mform->addHelpButton('behaviour', 'howquestionsbehave', 'question');
 
@@ -100,6 +109,7 @@ class question_preview_options extends question_display_options {
      */
     public function __construct($question) {
         global $CFG;
+        $this->qvariant = 1;
         $this->behaviour = 'deferredfeedback';
         $this->maxmark = $question->defaultmark;
         $this->correctness = self::VISIBLE;
@@ -127,7 +137,8 @@ class question_preview_options extends question_display_options {
      */
     protected function get_field_types() {
         return array(
-            'behaviour' => PARAM_ALPHA,
+            'qvariant' => PARAM_INT,
+        	'behaviour' => PARAM_ALPHA,
             'maxmark' => PARAM_NUMBER,
             'correctness' => PARAM_BOOL,
             'marks' => PARAM_INT,

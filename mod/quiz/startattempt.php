@@ -145,7 +145,7 @@ if (!($quiz->attemptonlast && $lastattempt)) {
     }
 
     // Start all the quetsions.
-    $quba->start_all_questions();
+    $quba->start_all_questions($attemptnumber);
 
     // Update attempt layout.
     $newlayout = array();
@@ -167,7 +167,7 @@ if (!($quiz->attemptonlast && $lastattempt)) {
     foreach ($oldquba->get_attempt_iterator() as $oldslot => $oldqa) {
         $newslot = $quba->add_question($oldqa->get_question(), $oldqa->get_max_mark());
 
-        $quba->start_question_based_on($newslot, $oldqa);
+        $quba->start_question_based_on($newslot, $oldqa, $attemptnumber);
 
         $oldnumberstonew[$oldslot] = $newslot;
     }
