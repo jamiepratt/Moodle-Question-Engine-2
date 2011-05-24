@@ -764,19 +764,20 @@ class question_attempt {
         // Initialise the first step.
         $firststep = new question_attempt_step($submitteddata, $timestamp, $userid);
         $firststep->set_state(question_state::$todo);
-        if ($randomisevariantorder){
-            $variantno = $this->randomise_variant_order($variantno);
-        } else {
-            $noofvariants = $this->question->get_no_of_variants();
-            $variantno = $variantno % $noofvariants;
-            if ($variantno == 0) {
-                $variantno = $noofvariants;
-            }
-        }
-        $firststep->set_behaviour_var('_variantno', $variantno);
+
         if ($submitteddata) {
             $this->question->apply_attempt_state($firststep);
         } else {
+            if ($randomisevariantorder){
+                $variantno = $this->randomise_variant_order($variantno);
+            } else {
+                $noofvariants = $this->question->get_no_of_variants();
+                $variantno = $variantno % $noofvariants;
+                if ($variantno == 0) {
+                    $variantno = $noofvariants;
+                }
+            }
+            $firststep->set_behaviour_var('_variantno', $variantno);
             $this->behaviour->init_first_step($firststep);
         }
         $this->add_step($firststep);
