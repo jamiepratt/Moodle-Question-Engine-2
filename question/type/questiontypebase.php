@@ -493,7 +493,7 @@ class question_type {
         global $DB;
         $context = $formdata->context;
 
-        $oldhints = $DB->get_records('question_hints', array('questionid' => $formdata->id));
+        $oldhints = $DB->get_records('question_hints', array('questionid' => $formdata->id), 'id ASC');
 
         if (!empty($formdata->hint)) {
             $numhints = max(array_keys($formdata->hint)) + 1;
